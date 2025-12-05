@@ -20,3 +20,13 @@ func Gcd[T Integer](x, y T) T {
 func Lcm[T Integer](x, y T) T {
 	return x / Gcd(x, y) * y
 }
+
+func Pow[S, T Integer](x S, n T, m S) S {
+	r := S(1)
+	for ; n > 0; n, x = n>>1, x*x%m {
+		if n%2 == 1 {
+			r = r * x % m
+		}
+	}
+	return r
+}

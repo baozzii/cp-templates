@@ -36,21 +36,21 @@ func (q *Deque[T]) PopBack() (v T) {
 	return
 }
 
-func (q Deque[T]) Front() T {
+func (q *Deque[T]) Front() T {
 	if len(q.l) > 0 {
 		return q.l[len(q.l)-1]
 	}
 	return q.r[0]
 }
 
-func (q Deque[T]) Back() T {
+func (q *Deque[T]) Back() T {
 	if len(q.r) > 0 {
 		return q.r[len(q.r)-1]
 	}
 	return q.l[0]
 }
 
-func (q Deque[T]) Get(i int) T {
+func (q *Deque[T]) Get(i int) T {
 	if i < len(q.l) {
 		return q.l[len(q.l)-1-i]
 	}
