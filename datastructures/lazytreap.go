@@ -148,7 +148,7 @@ func (tr *LazyTreap[T, K, M]) Insert(i int, x T) {
 	tr.root = tr.Merge(lo, tr.Merge(tr.new_node(x), ro))
 }
 
-func (tr *LazyTreap[T, K, M]) Erase(i int, x T) {
+func (tr *LazyTreap[T, K, M]) Erase(i int) {
 	o, ro := tr.Split(tr.root, i+1)
 	lo, _ := tr.Split(o, i)
 	tr.root = tr.Merge(lo, ro)

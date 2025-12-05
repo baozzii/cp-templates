@@ -100,7 +100,7 @@ func (tr *Treap[T, M]) Insert(i int, x T) {
 	tr.root = tr.Merge(lo, tr.Merge(tr.new_node(x), ro))
 }
 
-func (tr *Treap[T, M]) Erase(i int, x T) {
+func (tr *Treap[T, M]) Erase(i int) {
 	o, ro := tr.Split(tr.root, i+1)
 	lo, _ := tr.Split(o, i)
 	tr.root = tr.Merge(lo, ro)
