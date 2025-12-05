@@ -1,30 +1,30 @@
 package datastructures
 
-import "math/bits"
+import . "codeforces-go/common"
 
-type segtree_info[T any] interface {
+type SegtreeInfo[T any] interface {
 	op(T, T) T
 	e() T
 }
 
-type segtree[T any, M segtree_info[T]] struct {
+type Segtree[T any, M SegtreeInfo[T]] struct {
 	n, size, log int
 	d            []T
 	op           func(T, T) T
 	e            func() T
 }
 
-func (seg *segtree[T, M]) update(i int) {
+func (seg *Segtree[T, M]) update(i int) {
 	seg.d[i] = seg.op(seg.d[i<<1], seg.d[i<<1|1])
 }
 
-func new_segtree_with[T any, M segtree_info[T]](a []T, m M) *segtree[T, M] {
+func NewSegtreeWith[T any, M SegtreeInfo[T]](a []T, m M) *Segtree[T, M] {
 	size := 1
 	n := len(a)
 	for size < n {
 		size <<= 1
 	}
-	log := bits.TrailingZeros(uint(size))
+	log := Ctz(size)
 	d := make([]T, size<<1)
 	for i := range d {
 		d[i] = m.e()
@@ -35,18 +35,18 @@ func new_segtree_with[T any, M segtree_info[T]](a []T, m M) *segtree[T, M] {
 	for i := size - 1; i > 0; i-- {
 		d[i] = m.op(d[i<<1], d[i<<1|1])
 	}
-	return &segtree[T, M]{n, size, log, d, m.op, m.e}
+	return &Segtree[T, M]{n, size, log, d, m.op, m.e}
 }
 
-func new_segtree[T any, M segtree_info[T]](n int, m M) *segtree[T, M] {
+func NewSegtree[T any, M SegtreeInfo[T]](n int, m M) *Segtree[T, M] {
 	a := make([]T, n)
 	for i := range a {
 		a[i] = m.e()
 	}
-	return new_segtree_with(a, m)
+	return NewSegtreeWith(a, m)
 }
 
-func (seg *segtree[T, M]) set(p int, x T) {
+func (seg *Segtree[T, M]) Set(p int, x T) {
 	p += seg.size
 	seg.d[p] = x
 	for i := 1; i <= seg.log; i++ {
@@ -54,11 +54,11 @@ func (seg *segtree[T, M]) set(p int, x T) {
 	}
 }
 
-func (seg *segtree[T, M]) get(p int) T {
+func (seg *Segtree[T, M]) Get(p int) T {
 	return seg.d[p+seg.size]
 }
 
-func (seg *segtree[T, M]) prod(l, r int) T {
+func (seg *Segtree[T, M]) Prod(l, r int) T {
 	e := seg.e
 	op := seg.op
 	sml := e()
@@ -76,11 +76,11 @@ func (seg *segtree[T, M]) prod(l, r int) T {
 	return op(sml, smr)
 }
 
-func (seg *segtree[T, M]) all_prod() T {
+func (seg *Segtree[T, M]) AllProd() T {
 	return seg.d[1]
 }
 
-func (seg *segtree[T, M]) max_right(l int, f func(T) bool) int {
+func (seg *Segtree[T, M]) MaxRight(l int, f func(T) bool) int {
 	if l == seg.n {
 		return seg.n
 	}
@@ -108,7 +108,7 @@ func (seg *segtree[T, M]) max_right(l int, f func(T) bool) int {
 	return seg.n
 }
 
-func (seg *segtree[T, M]) min_left(r int, f func(T) bool) int {
+func (seg *Segtree[T, M]) MinLeft(r int, f func(T) bool) int {
 	if r == 0 {
 		return 0
 	}

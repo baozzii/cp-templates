@@ -1,21 +1,21 @@
 package datastructures
 
-type queue[T any] struct {
+type Queue[T any] struct {
 	t []T
 }
 
-func new_queue[T any]() *queue[T] {
-	return &queue[T]{}
+func NewQueue[T any]() *Queue[T] {
+	return &Queue[T]{}
 }
 
-func (q *queue[T]) push(x T) {
+func (q *Queue[T]) Push(x T) {
 	q.t = append(q.t, x)
 }
 
-func (q *queue[T]) front() T {
+func (q *Queue[T]) Front() T {
 	return q.t[0]
 }
 
-func (q *queue[T]) pop() {
+func (q *Queue[T]) Pop() {
 	q.t = q.t[1:]
 }
