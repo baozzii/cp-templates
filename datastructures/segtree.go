@@ -14,7 +14,7 @@ type Segtree[T any, M SegtreeInfo[T]] struct {
 	e            func() T
 }
 
-func (seg *Segtree[T, M]) update(i int) {
+func (seg *Segtree[T, M]) pushup(i int) {
 	seg.d[i] = seg.op(seg.d[i<<1], seg.d[i<<1|1])
 }
 
@@ -50,7 +50,7 @@ func (seg *Segtree[T, M]) Set(p int, x T) {
 	p += seg.size
 	seg.d[p] = x
 	for i := 1; i <= seg.log; i++ {
-		seg.update(p >> i)
+		seg.pushup(p >> i)
 	}
 }
 

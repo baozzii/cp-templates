@@ -9,3 +9,8 @@ type RealNumber interface {
 	Integer |
 		~float32 | ~float64
 }
+
+type ComplexNumber interface {
+	RealNumber |
+		~complex64 | ~complex128
+}
