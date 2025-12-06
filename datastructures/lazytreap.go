@@ -1,5 +1,9 @@
 package datastructures
 
+/*
+https://judge.yosupo.jp/submission/334576
+*/
+
 import "math/rand"
 
 type LazyTreapInfo[T any, K any] interface {

@@ -1,5 +1,9 @@
 package datastructures
 
+/*
+https://judge.yosupo.jp/submission/334041
+*/
+
 type FenwickInfo[T any] interface {
 	add(T, T) T
 	sub(T, T) T

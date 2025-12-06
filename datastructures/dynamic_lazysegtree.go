@@ -1,5 +1,9 @@
 package datastructures
 
+/*
+https://judge.yosupo.jp/submission/334845
+*/
+
 type DynamicLazySegtreeInfo[T, K any] interface {
 	op(T, T) T
 	e() T

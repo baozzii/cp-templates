@@ -1,5 +1,9 @@
 package datastructures
 
+/*
+https://judge.yosupo.jp/submission/334191
+*/
+
 import . "codeforces-go/common"
 
 type SparseTableInfo[T any] interface {
