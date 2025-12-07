@@ -1,5 +1,9 @@
 package math
 
+/*
+https://judge.yosupo.jp/submission/334632
+*/
+
 type Comb struct {
 	fac, ifac []int
 	n         int
