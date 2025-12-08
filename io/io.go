@@ -11,10 +11,11 @@ type IO struct {
 	out        Writer
 	rbuf, wbuf []byte
 	i, n       int
+	fpc        int
 }
 
 func NewIO(in Reader, out Writer) *IO {
-	return &IO{in, out, make([]byte, 4096), make([]byte, 0), 0, 0}
+	return &IO{in, out, make([]byte, 4096), make([]byte, 0), 0, 0, -1}
 }
 
 func NewStdIO() *IO {
@@ -293,7 +294,7 @@ func (io *IO) Write(a ...any) {
 			}
 		case float32, float64:
 			{
-				s = []byte(strconv.FormatFloat(v.(float64), 'f', -1, 64))
+				s = []byte(strconv.FormatFloat(v.(float64), 'f', io.fpc, 64))
 			}
 		case string:
 			{
@@ -305,6 +306,10 @@ func (io *IO) Write(a ...any) {
 			io.wbuf = append(io.wbuf, ' ')
 		}
 	}
+}
+
+func (io *IO) SetPrecision(x int) {
+	io.fpc = x
 }
 
 func (io *IO) Writeln(a ...any) {

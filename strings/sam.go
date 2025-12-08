@@ -1,5 +1,9 @@
 package strings
 
+/*
+https://atcoder.jp/contests/abc433/submissions/71554910
+*/
+
 type SAMNode struct {
 	len, link int
 	next      []int
