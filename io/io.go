@@ -357,6 +357,11 @@ func (io *IO) Writeln(a ...any) {
 	io.Write("\n")
 }
 
-func (io *IO) Close() {
+func (io *IO) Flush() {
 	io.out.Write(io.wbuf)
+	io.wbuf = io.wbuf[:0]
+}
+
+func (io *IO) Close() {
+	io.Flush()
 }

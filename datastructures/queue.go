@@ -19,3 +19,7 @@ func (q *Queue[T]) Front() T {
 func (q *Queue[T]) Pop() {
 	q.t = q.t[1:]
 }
+
+func (q *Queue[T]) Empty() bool {
+	return len(q.t) == 0
+}
