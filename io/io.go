@@ -3,6 +3,7 @@ package io
 import (
 	. "io"
 	"os"
+	"reflect"
 	"strconv"
 )
 
@@ -249,61 +250,100 @@ func (io *IO) Read(ptrs ...any) {
 				*v = string(s)
 			}
 		}
+
 	}
 }
 
 func (io *IO) Write(a ...any) {
-	for i, p := range a {
+	uitos := func(v uint64) []byte {
 		var s []byte
-		switch v := p.(type) {
-		case uint, uint8, uint16, uint32, uint64:
-			{
-				if v == 0 {
-					s = append(s, '0')
-				} else {
-					for v.(uint) > 0 {
-						s = append(s, '0'+byte(v.(uint)%10))
-						v = v.(uint) / 10
-					}
-					for j := 0; j < len(s)/2; j++ {
-						s[j], s[len(s)-j-1] = s[len(s)-j-1], s[j]
-					}
-				}
-			}
-		case int, int8, int16, int32, int64:
-			{
-				if v == 0 {
-					s = append(s, '0')
-				} else {
-					neg := false
-					if v.(int) < 0 {
-						neg = true
-						v = -(v.(int))
-					}
-					for v.(int) > 0 {
-						s = append(s, '0'+byte(v.(int)%10))
-						v = v.(int) / 10
-					}
-					if neg {
-						s = append(s, '-')
-					}
-					for j := 0; j < len(s)/2; j++ {
-						s[j], s[len(s)-j-1] = s[len(s)-j-1], s[j]
-					}
-				}
-			}
-		case float32, float64:
-			{
-				s = []byte(strconv.FormatFloat(v.(float64), 'f', io.fpc, 64))
-			}
-		case string:
-			{
-				s = []byte(v)
-			}
+		if v == 0 {
+			return []byte{'0'}
 		}
-		io.wbuf = append(io.wbuf, s...)
-		if i != len(a)-1 {
+		for v > 0 {
+			s = append(s, '0'+byte(v%10))
+			v /= 10
+		}
+		for i := 0; i < len(s)/2; i++ {
+			s[i], s[len(s)-1-i] = s[len(s)-1-i], s[i]
+		}
+		return s
+	}
+	itos := func(v int64) []byte {
+		if v == 0 {
+			return []byte{'0'}
+		}
+		neg := v < 0
+		if neg {
+			v = -v
+		}
+		var s []byte
+		for v > 0 {
+			s = append(s, '0'+byte(v%10))
+			v /= 10
+		}
+		if neg {
+			s = append(s, '-')
+		}
+		for i := 0; i < len(s)/2; i++ {
+			s[i], s[len(s)-1-i] = s[len(s)-1-i], s[i]
+		}
+		return s
+	}
+
+	for i, p := range a {
+		if i != 0 {
 			io.wbuf = append(io.wbuf, ' ')
+		}
+		switch v := p.(type) {
+		case uint:
+			io.wbuf = append(io.wbuf, uitos(uint64(v))...)
+		case uint8:
+			io.wbuf = append(io.wbuf, uitos(uint64(v))...)
+		case uint16:
+			io.wbuf = append(io.wbuf, uitos(uint64(v))...)
+		case uint32:
+			io.wbuf = append(io.wbuf, uitos(uint64(v))...)
+		case uint64:
+			io.wbuf = append(io.wbuf, uitos(v)...)
+
+		case int:
+			io.wbuf = append(io.wbuf, itos(int64(v))...)
+		case int8:
+			io.wbuf = append(io.wbuf, itos(int64(v))...)
+		case int16:
+			io.wbuf = append(io.wbuf, itos(int64(v))...)
+		case int32:
+			io.wbuf = append(io.wbuf, itos(int64(v))...)
+		case int64:
+			io.wbuf = append(io.wbuf, itos(v)...)
+
+		case float32:
+			io.wbuf = append(io.wbuf, []byte(strconv.FormatFloat(float64(v), 'f', io.fpc, 64))...)
+		case float64:
+			io.wbuf = append(io.wbuf, []byte(strconv.FormatFloat(v, 'f', io.fpc, 64))...)
+		case string:
+			io.wbuf = append(io.wbuf, v...)
+		default:
+			rv := reflect.ValueOf(p)
+			if rv.Kind() == reflect.Slice {
+				if rv.Type().Elem().Kind() == reflect.Slice {
+					for j := 0; j < rv.Len(); j++ {
+						if j+1 == rv.Len() {
+							io.Write(rv.Index(j).Interface())
+						} else {
+							io.Writeln(rv.Index(j).Interface())
+						}
+					}
+				} else {
+					for j := 0; j < rv.Len(); j++ {
+						if j != 0 {
+							io.wbuf = append(io.wbuf, ' ')
+						}
+						io.Write(rv.Index(j).Interface())
+					}
+				}
+			}
 		}
 	}
 }
