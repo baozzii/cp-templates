@@ -1,57 +1,71 @@
 package graphs
 
-import . "codeforces-go/common"
-
 type LCA struct {
 	t  *Tree
-	st [][]int
+	st [][]int32
+	lg []int32
 }
 
 func NewLCA(t *Tree) *LCA {
 	n := t.n
-	l := 63 - Clz(n)
-	st := make([][]int, l+1)
-	for i := range st {
-		st[i] = make([]int, n)
-		for j := range st[i] {
-			st[i][j] = -1
+	lg := make([]int32, n+1)
+	for i := 2; i <= n; i++ {
+		lg[i] = lg[i>>1] + 1
+	}
+	K := lg[n]
+	st := make([][]int32, K+1)
+	st[0] = make([]int32, n)
+	for pos := 0; pos < n; pos++ {
+		u := t.ord[pos]
+		st[0][pos] = int32(t.pa[u])
+	}
+	get := func(x, y int32) int32 {
+		if x == -1 {
+			return y
+		}
+		if y == -1 {
+			return x
+		}
+		if t.in[x] < t.in[y] {
+			return x
+		}
+		return y
+	}
+	for k := int32(1); k <= K; k++ {
+		length := 1 << k
+		half := length >> 1
+		st[k] = make([]int32, n-length+1)
+		for i := 0; i+length <= n; i++ {
+			st[k][i] = get(st[k-1][i], st[k-1][i+half])
 		}
 	}
-	for i := 0; i < n; i++ {
-		st[0][t.in[i]] = i
-	}
-	for j := 1; j <= l; j++ {
-		for i := 0; i+(1<<j) <= n; i++ {
-			u, v := st[j-1][i], st[j-1][i+(1<<(j-1))]
-			var w int
-			if t.dep[u] > t.dep[v] {
-				w = v
-			} else {
-				w = u
-			}
-			st[j][i] = w
-		}
-	}
-	return &LCA{t, st}
+	return &LCA{t: t, st: st, lg: lg}
 }
 
 func (s *LCA) lca(u, v int) int {
 	if u == v {
 		return u
 	}
-	u = s.t.in[u]
-	v = s.t.in[v]
-	if u > v {
-		u, v = v, u
+	t := s.t
+	du, dv := t.in[u], t.in[v]
+	if du > dv {
+		du, dv = dv, du
 	}
-	u++
-	v++
-	i := 63 - Clz(v-u)
-	var w int
-	if s.t.dep[s.st[i][u]] > s.t.dep[s.st[i][v-(1<<i)]] {
-		w = s.st[i][v-(1<<i)]
-	} else {
-		w = s.st[i][u]
+	L := du + 1
+	R := dv
+	length := R - L + 1
+	k := s.lg[length]
+	row := s.st[k]
+	x := row[L]
+	y := row[R-(1<<k)+1]
+	if x == -1 {
+		return int(y)
 	}
-	return s.t.pa[w]
+	if y == -1 {
+		return int(x)
+	}
+	if t.in[x] < t.in[y] {
+		return int(x)
+	}
+	return int(y)
 }
