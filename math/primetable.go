@@ -53,11 +53,8 @@ func (pt *PrimeTable) Factorize(x int) []int {
 	}
 	factors := make([]int, 0)
 	for x > 1 {
-		p := pt.mpf[x]
-		factors = append(factors, p)
-		for x%p == 0 {
-			x /= p
-		}
+		factors = append(factors, pt.mpf[x])
+		x /= pt.mpf[x]
 	}
 	return factors
 }
