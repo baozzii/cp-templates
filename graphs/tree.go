@@ -2,6 +2,7 @@ package graphs
 
 type Tree struct {
 	n       int
+	root    int
 	adj     [][]int
 	pa      []int
 	in, out []int
@@ -10,7 +11,7 @@ type Tree struct {
 }
 
 func NewTree(n int) *Tree {
-	return &Tree{n, make([][]int, n), make([]int, n), make([]int, n), make([]int, n), make([]int, n), make([]int, n)}
+	return &Tree{n, 0, make([][]int, n), make([]int, n), make([]int, n), make([]int, n), make([]int, n), make([]int, n)}
 }
 
 func (t *Tree) AddEdge(u, v int) {
@@ -18,7 +19,11 @@ func (t *Tree) AddEdge(u, v int) {
 	t.adj[v] = append(t.adj[v], u)
 }
 
-func (t *Tree) Build(r int) {
+func (t *Tree) SetRoot(r int) {
+	t.root = r
+}
+
+func (t *Tree) Build() {
 	ts := 0
 	var dfs func(int, int)
 	dfs = func(u, p int) {
@@ -37,5 +42,5 @@ func (t *Tree) Build(r int) {
 		t.adj[u] = append([]int{}, ch...)
 		t.out[u] = ts
 	}
-	dfs(r, -1)
+	dfs(t.root, -1)
 }
