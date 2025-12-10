@@ -44,3 +44,20 @@ func (fen *Fenwick[T, M]) Pre(i int) T {
 func (fen *Fenwick[T, M]) Sum(l, r int) T {
 	return fen.sub(fen.Pre(r), fen.Pre(l))
 }
+
+type FenSum struct{}
+
+func (FenSum) add(x, y int) int { return x + y }
+func (FenSum) sub(x, y int) int { return x - y }
+func (FenSum) e() int           { return 0 }
+
+type FenMax struct{}
+
+func (FenMax) add(x, y int) int { return max(x, y) }
+func (FenMax) e() int           { return int(-1e18) }
+
+type FenXor struct{}
+
+func (FenXor) add(x, y int) int { return x ^ y }
+func (FenXor) sub(x, y int) int { return x ^ y }
+func (FenXor) e() int           { return 0 }

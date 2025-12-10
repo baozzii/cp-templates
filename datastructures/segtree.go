@@ -135,3 +135,18 @@ func (seg *Segtree[T, M]) MinLeft(r int, f func(T) bool) int {
 	}
 	return 0
 }
+
+type SegMax struct{}
+
+func (SegMax) op(x, y int) int { return max(x, y) }
+func (SegMax) e() int          { return int(-1e18) }
+
+type SegMin struct{}
+
+func (SegMin) op(x, y int) int { return min(x, y) }
+func (SegMin) e() int          { return int(1e18) }
+
+type SegSum struct{}
+
+func (SegSum) op(x, y int) int { return x + y }
+func (SegSum) e() int          { return 0 }

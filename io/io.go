@@ -37,6 +37,17 @@ func (io *IO) read_byte() byte {
 }
 
 func (io *IO) Read(ptrs ...any) {
+	var rd func(v reflect.Value)
+	rd = func(v reflect.Value) {
+		for i := 0; i < v.Len(); i++ {
+			elem := v.Index(i)
+			if elem.Kind() == reflect.Slice {
+				rd(elem)
+			} else {
+				io.Read(elem.Addr().Interface())
+			}
+		}
+	}
 	for _, p := range ptrs {
 		switch v := any(p).(type) {
 		case *uint:
@@ -249,8 +260,12 @@ func (io *IO) Read(ptrs ...any) {
 				}
 				*v = string(s)
 			}
+		default:
+			rv := reflect.ValueOf(p)
+			if rv.Kind() == reflect.Ptr && rv.Elem().Kind() == reflect.Slice {
+				rd(rv.Elem())
+			}
 		}
-
 	}
 }
 

@@ -23,3 +23,7 @@ func (q *Queue[T]) Pop() {
 func (q *Queue[T]) Empty() bool {
 	return len(q.t) == 0
 }
+
+func (q *Queue[T]) Size() int {
+	return len(q.t)
+}
