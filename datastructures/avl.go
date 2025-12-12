@@ -177,6 +177,10 @@ func (t *AVL[T, M]) CountGe(x T) int {
 	return t.Size() - t.CountLt(x)
 }
 
+func (t *AVL[T, M]) CountBetween(x, y T) int {
+	return t.CountLt(y) - t.CountLt(x)
+}
+
 func (t *AVL[T, M]) Get(k int) T {
 	o := t.root
 	for o != 0 {
