@@ -170,11 +170,7 @@ func PolyExp(_a Poly, m int) Poly {
 	k := 1
 	for k < m {
 		k <<= 1
-		g := Poly{1}
-		g = PolySub(g, PolyLog(f, k))
-		g = PolyAdd(g, PolyTrunc(_a, k))
-		g = PolyMul(f, g)
-		f = PolyTrunc(g, k)
+		f = PolyTrunc(PolyMul(PolyAdd(PolySub(Poly{1}, PolyLog(f, k)), PolyTrunc(_a, k)), f), k)
 	}
 	return PolyTrunc(f, m)
 }
