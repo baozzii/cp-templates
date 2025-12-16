@@ -5,17 +5,17 @@ https://atcoder.jp/contests/abc433/submissions/71554910
 */
 
 type SAMNode struct {
-	len, link int
-	next      []int
+	len, link int32
+	next      []int32
 }
 
 type SAM struct {
-	sig, last int
+	sig, last int32
 	tr        []SAMNode
 }
 
-func (s *SAM) new_node(len, link int) {
-	next := make([]int, s.sig)
+func (s *SAM) new_node(len, link int32) {
+	next := make([]int32, s.sig)
 	for i := range next {
 		next[i] = -1
 	}
@@ -26,13 +26,13 @@ func (s *SAM) new_node(len, link int) {
 func NewSAM(sig int) *SAM {
 	sam := SAM{}
 	sam.last = 0
-	sam.sig = sig
+	sam.sig = int32(sig)
 	sam.new_node(0, -1)
 	return &sam
 }
 
 func (s *SAM) Extend(c int) int {
-	cur := len(s.tr)
+	cur := int32(len(s.tr))
 	s.new_node(s.tr[s.last].len+1, -1)
 	p := s.last
 	for p != -1 && s.tr[p].next[c] == -1 {
@@ -46,7 +46,7 @@ func (s *SAM) Extend(c int) int {
 		if s.tr[p].len+1 == s.tr[q].len {
 			s.tr[cur].link = q
 		} else {
-			clone := len(s.tr)
+			clone := int32(len(s.tr))
 			s.new_node(s.tr[p].len+1, s.tr[q].link)
 			copy(s.tr[len(s.tr)-1].next, s.tr[q].next)
 			for p != -1 && s.tr[p].next[c] == q {
@@ -58,7 +58,7 @@ func (s *SAM) Extend(c int) int {
 		}
 	}
 	s.last = cur
-	return s.last
+	return int(s.last)
 }
 
 func (s *SAM) Size() int {
@@ -66,13 +66,13 @@ func (s *SAM) Size() int {
 }
 
 func (s *SAM) Len(u int) int {
-	return s.tr[u].len
+	return int(s.tr[u].len)
 }
 
 func (s *SAM) Link(u int) int {
-	return s.tr[u].link
+	return int(s.tr[u].link)
 }
 
 func (s *SAM) Next(u, c int) int {
-	return s.tr[u].next[c]
+	return int(s.tr[u].next[c])
 }

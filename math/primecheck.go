@@ -1,5 +1,9 @@
 package math
 
+/*
+https://judge.yosupo.jp/submission/337208
+*/
+
 import (
 	. "codeforces-go/common"
 	"math/bits"
