@@ -6,15 +6,15 @@ type AVLInfo[T any] interface {
 
 type AVLNode[T any, M AVLInfo[T]] struct {
 	key  T
-	cnt  int
-	h, s int
-	l, r int
+	cnt  int32
+	h, s int32
+	l, r int32
 }
 
 type AVL[T any, M AVLInfo[T]] struct {
 	t    []AVLNode[T, M]
 	cmp  func(T, T) int
-	root int
+	root int32
 }
 
 func NewAVL[T any, M AVLInfo[T]](m M) *AVL[T, M] {
@@ -22,23 +22,23 @@ func NewAVL[T any, M AVLInfo[T]](m M) *AVL[T, M] {
 	return &AVL[T, M]{t, m.cmp, 0}
 }
 
-func (t *AVL[T, M]) new_node(x T, c int) int {
-	t.t = append(t.t, AVLNode[T, M]{x, c, 1, c, 0, 0})
-	return len(t.t) - 1
+func (t *AVL[T, M]) new_node(x T, c int) int32 {
+	t.t = append(t.t, AVLNode[T, M]{x, int32(c), 1, int32(c), 0, 0})
+	return int32(len(t.t) - 1)
 }
 
-func (t *AVL[T, M]) pushup(o int) {
+func (t *AVL[T, M]) pushup(o int32) {
 	if o != 0 {
 		t.t[o].h = max(t.t[t.t[o].l].h, t.t[t.t[o].r].h) + 1
 		t.t[o].s = t.t[t.t[o].l].s + t.t[t.t[o].r].s + t.t[o].cnt
 	}
 }
 
-func (t *AVL[T, M]) balance(o int) int {
+func (t *AVL[T, M]) balance(o int32) int32 {
 	return t.t[t.t[o].l].h - t.t[t.t[o].r].h
 }
 
-func (t *AVL[T, M]) rotate_right(y int) int {
+func (t *AVL[T, M]) rotate_right(y int32) int32 {
 	x := t.t[y].l
 	z := t.t[x].r
 	t.t[x].r = y
@@ -48,7 +48,7 @@ func (t *AVL[T, M]) rotate_right(y int) int {
 	return x
 }
 
-func (t *AVL[T, M]) rotate_left(y int) int {
+func (t *AVL[T, M]) rotate_left(y int32) int32 {
 	x := t.t[y].r
 	z := t.t[x].l
 	t.t[x].l = y
@@ -58,7 +58,7 @@ func (t *AVL[T, M]) rotate_left(y int) int {
 	return x
 }
 
-func (t *AVL[T, M]) rebalance(o int) int {
+func (t *AVL[T, M]) rebalance(o int32) int32 {
 	if o != 0 {
 		t.pushup(o)
 		b := t.balance(o)
@@ -79,8 +79,8 @@ func (t *AVL[T, M]) rebalance(o int) int {
 }
 
 func (t *AVL[T, M]) Insert(x T) {
-	var insert func(int, T) int
-	insert = func(o int, x T) int {
+	var insert func(int32, T) int32
+	insert = func(o int32, x T) int32 {
 		if o == 0 {
 			return t.new_node(x, 1)
 		}
@@ -99,9 +99,9 @@ func (t *AVL[T, M]) Insert(x T) {
 
 func (t *AVL[T, M]) Erase(x T) {
 	var nk T
-	var nc int
-	var rm func(int) int
-	rm = func(o int) int {
+	var nc int32
+	var rm func(int32) int32
+	rm = func(o int32) int32 {
 		if t.t[o].l == 0 {
 			nk = t.t[o].key
 			nc = t.t[o].cnt
@@ -111,8 +111,8 @@ func (t *AVL[T, M]) Erase(x T) {
 		return t.rebalance(o)
 	}
 
-	var erase func(int, T) int
-	erase = func(o int, x T) int {
+	var erase func(int32, T) int32
+	erase = func(o int32, x T) int32 {
 		if o == 0 {
 			return 0
 		}
@@ -147,7 +147,7 @@ func (t *AVL[T, M]) CountLt(x T) int {
 		if p <= 0 {
 			o = t.t[o].l
 		} else {
-			res += t.t[t.t[o].l].s + t.t[o].cnt
+			res += int(t.t[t.t[o].l].s + t.t[o].cnt)
 			o = t.t[o].r
 		}
 	}
@@ -162,7 +162,7 @@ func (t *AVL[T, M]) CountLe(x T) int {
 		if p < 0 {
 			o = t.t[o].l
 		} else {
-			res += t.t[t.t[o].l].s + t.t[o].cnt
+			res += int(t.t[t.t[o].l].s + t.t[o].cnt)
 			o = t.t[o].r
 		}
 	}
@@ -185,12 +185,12 @@ func (t *AVL[T, M]) Get(k int) T {
 	o := t.root
 	for o != 0 {
 		left := t.t[t.t[o].l].s
-		if k < left {
+		if k < int(left) {
 			o = t.t[o].l
-		} else if k < left+t.t[o].cnt {
+		} else if k < int(left+t.t[o].cnt) {
 			return t.t[o].key
 		} else {
-			k -= left + t.t[o].cnt
+			k -= int(left + t.t[o].cnt)
 			o = t.t[o].r
 		}
 	}
@@ -202,7 +202,7 @@ func (t *AVL[T, M]) Count(x T) int {
 	for o != 0 {
 		p := t.cmp(x, t.t[o].key)
 		if p == 0 {
-			return t.t[o].cnt
+			return int(t.t[o].cnt)
 		} else if p < 0 {
 			o = t.t[o].l
 		} else {
@@ -220,7 +220,7 @@ func (t *AVL[T, M]) FindLt(x, d T) T {
 		if p <= 0 {
 			o = t.t[o].l
 		} else {
-			ans = o
+			ans = int(o)
 			o = t.t[o].r
 		}
 	}
@@ -238,7 +238,7 @@ func (t *AVL[T, M]) FindLe(x, d T) T {
 		if p < 0 {
 			o = t.t[o].l
 		} else {
-			ans = o
+			ans = int(o)
 			o = t.t[o].r
 		}
 	}
@@ -254,7 +254,7 @@ func (t *AVL[T, M]) FindGt(x, d T) T {
 	for o != 0 {
 		p := t.cmp(x, t.t[o].key)
 		if p < 0 {
-			ans = o
+			ans = int(o)
 			o = t.t[o].l
 		} else {
 			o = t.t[o].r
@@ -272,7 +272,7 @@ func (t *AVL[T, M]) FindGe(x, d T) T {
 	for o != 0 {
 		p := t.cmp(x, t.t[o].key)
 		if p <= 0 {
-			ans = o
+			ans = int(o)
 			o = t.t[o].l
 		} else {
 			o = t.t[o].r
@@ -285,5 +285,5 @@ func (t *AVL[T, M]) FindGe(x, d T) T {
 }
 
 func (t *AVL[T, M]) Size() int {
-	return t.t[t.root].s
+	return int(t.t[t.root].s)
 }
