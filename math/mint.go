@@ -1,7 +1,5 @@
 package math
 
-import . "cp-templates/common"
-
 const M = 998244353
 
 func Norm(x int) int {
@@ -32,8 +30,17 @@ func Mul(x, y int) int {
 	return Norm(x * y)
 }
 
+func Exgcd(a, b int) (int, int, int) {
+	if b == 0 {
+		return a, 1, 0
+	}
+	d, x2, y2 := Exgcd(b, a%b)
+	return d, y2, x2 - (a/b)*y2
+}
+
 func Inv(x int) int {
-	return Pow(x, M-2, M)
+	_, y, _ := Exgcd(x, M)
+	return Norm(y)
 }
 
 func Div(x, y int) int {
