@@ -58,3 +58,30 @@ func (pt *PrimeTable) Factorize(x int) []int {
 	}
 	return factors
 }
+
+func (pt *PrimeTable) Core(x int) int {
+	y := 1
+	for x > 1 {
+		c := 0
+		v := pt.mpf[x]
+		for w := v; w == v; x, w = x/int(v), pt.mpf[x/int(v)] {
+			c ^= 1
+		}
+		if c == 1 {
+			y *= int(v)
+		}
+	}
+	return y
+}
+
+func (pt *PrimeTable) Get(i int) int {
+	return int(pt.pr[i])
+}
+
+func (pt *PrimeTable) Phi(x int) int {
+	return int(pt.phi[x])
+}
+
+func (pt *PrimeTable) Mu(x int) int {
+	return int(pt.mu[x])
+}
