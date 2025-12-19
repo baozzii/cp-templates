@@ -5,7 +5,7 @@ https://judge.yosupo.jp/submission/337208
 */
 
 import (
-	. "codeforces-go/common"
+	. "cp-templates/common"
 	"math/bits"
 )
 

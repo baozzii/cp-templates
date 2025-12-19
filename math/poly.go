@@ -6,7 +6,7 @@ https://judge.yosupo.jp/submission/336315 PolyInv
 https://judge.yosupo.jp/submission/336316 PolyLog
 */
 
-import . "codeforces-go/common"
+import . "cp-templates/common"
 
 var rev []int
 var roots = []int{0, 1}
@@ -173,4 +173,14 @@ func PolyExp(_a Poly, m int) Poly {
 		f = PolyTrunc(PolyMul(PolyAdd(PolySub(Poly{1}, PolyLog(f, k)), PolyTrunc(_a, k)), f), k)
 	}
 	return PolyTrunc(f, m)
+}
+
+func PolyPow(_a Poly, n, m int) Poly {
+	f := Poly{1}
+	for ; n > 0; n, _a = n>>1, PolyMul(_a, _a) {
+		if n%2 == 1 {
+			f = PolyTrunc(PolyMul(f, _a), m)
+		}
+	}
+	return f
 }

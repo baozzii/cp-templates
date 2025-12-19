@@ -1,6 +1,6 @@
 package math
 
-import . "codeforces-go/common"
+import . "cp-templates/common"
 
 const M = 998244353
 

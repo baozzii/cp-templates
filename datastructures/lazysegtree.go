@@ -1,6 +1,6 @@
 package datastructures
 
-import . "codeforces-go/common"
+import . "cp-templates/common"
 
 type LazySegtreeInfo[T, K any] interface {
 	op(T, T) T
