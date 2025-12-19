@@ -10,16 +10,13 @@ import (
 	"strings"
 )
 
-var (
-	in  = bufio.NewReader(os.Stdin)
-	out = bufio.NewWriter(os.Stdout)
-)
-
 type LeetcodeIO struct {
 	paramtypes []reflect.Type
 	paramcount int
 	fntype     reflect.Type
 	fn         reflect.Value
+	in         *bufio.Reader
+	out        *bufio.Writer
 }
 
 func RegisterFunc(f any) *LeetcodeIO {
@@ -33,7 +30,7 @@ func RegisterFunc(f any) *LeetcodeIO {
 	for i := 0; i < pcount; i++ {
 		paramtypes[i] = fntype.In(i)
 	}
-	return &LeetcodeIO{paramtypes, pcount, fntype, fn}
+	return &LeetcodeIO{paramtypes, pcount, fntype, fn, bufio.NewReader(os.Stdin), bufio.NewWriter(os.Stdout)}
 }
 
 func (io *LeetcodeIO) parse(s string, r reflect.Type) reflect.Value {
@@ -91,18 +88,18 @@ func (io *LeetcodeIO) format(r reflect.Value) string {
 }
 
 func (io *LeetcodeIO) Run() {
-	defer out.Flush()
+	defer io.out.Flush()
 	for {
 		args := make([]reflect.Value, io.paramcount)
 		for i := 0; i < io.paramcount; i++ {
-			s, err := in.ReadString('\n')
+			s, err := io.in.ReadString('\n')
 			if err != nil && len(s) == 0 {
 				return
 			}
 			args[i] = io.parse(strings.TrimSpace(s), io.paramtypes[i])
 		}
 		res := io.execute(args)
-		fmt.Fprintln(out, io.format(res[0]))
+		fmt.Fprintln(io.out, io.format(res[0]))
 	}
 }
 
