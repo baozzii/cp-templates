@@ -23,18 +23,18 @@ func (s *Umap[T, K]) Clear() {
 	clear(*s)
 }
 
-func (s *Umap[T, K]) Keys() *Vec[T] {
+func (s *Umap[T, K]) Keys() Vec[T] {
 	b := make(Vec[T], 0, s.Size())
 	for v := range *s {
 		b.PushBack(v)
 	}
-	return &b
+	return b
 }
 
-func (s *Umap[T, K]) Values() *Vec[K] {
+func (s *Umap[T, K]) Values() Vec[K] {
 	b := make(Vec[K], 0, s.Size())
 	for _, v := range *s {
 		b.PushBack(v)
 	}
-	return &b
+	return b
 }

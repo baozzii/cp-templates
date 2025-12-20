@@ -27,16 +27,16 @@ func (s *Uset[T]) Clear() {
 	clear(*s)
 }
 
-func (s *Uset[T]) Keys() *Vec[T] {
+func (s *Uset[T]) Keys() Vec[T] {
 	b := make(Vec[T], 0, s.Size())
 	for v := range *s {
 		b.PushBack(v)
 	}
-	return &b
+	return b
 }
 
-func (s *Uset[T]) FromVec(v *Vec[T]) {
-	for _, w := range *v {
+func (s *Uset[T]) FromVec(v Vec[T]) {
+	for _, w := range v {
 		s.Insert(w)
 	}
 }
