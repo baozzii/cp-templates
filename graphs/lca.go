@@ -9,13 +9,13 @@ type LCA struct {
 func NewLCA(t *Tree) *LCA {
 	n := t.n
 	lg := make([]int32, n+1)
-	for i := 2; i <= n; i++ {
+	for i := int32(2); i <= n; i++ {
 		lg[i] = lg[i>>1] + 1
 	}
 	K := lg[n]
 	st := make([][]int32, K+1)
 	st[0] = make([]int32, n)
-	for pos := 0; pos < n; pos++ {
+	for pos := int32(0); pos < n; pos++ {
 		u := t.ord[pos]
 		st[0][pos] = int32(t.pa[u])
 	}
@@ -32,10 +32,10 @@ func NewLCA(t *Tree) *LCA {
 		return y
 	}
 	for k := int32(1); k <= K; k++ {
-		length := 1 << k
+		length := int32(1) << k
 		half := length >> 1
 		st[k] = make([]int32, n-length+1)
-		for i := 0; i+length <= n; i++ {
+		for i := int32(0); i+length <= n; i++ {
 			st[k][i] = get(st[k-1][i], st[k-1][i+half])
 		}
 	}
