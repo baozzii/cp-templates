@@ -30,3 +30,11 @@ func Pow[S, T Integer](x S, n T, m S) S {
 	}
 	return r
 }
+
+func Exgcd[T Integer](a, b T) (T, T, T) {
+	if b == 0 {
+		return a, 1, 0
+	}
+	d, x2, y2 := Exgcd(b, a%b)
+	return d, y2, x2 - (a/b)*y2
+}
