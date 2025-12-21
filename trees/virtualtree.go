@@ -1,4 +1,4 @@
-package graphs
+package trees
 
 /*
 https://www.luogu.com.cn/record/252532463

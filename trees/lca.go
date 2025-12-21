@@ -1,4 +1,4 @@
-package graphs
+package trees
 
 type LCA struct {
 	t  *Tree

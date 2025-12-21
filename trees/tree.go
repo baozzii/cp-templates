@@ -1,4 +1,4 @@
-package graphs
+package trees
 
 type Tree struct {
 	n       int32

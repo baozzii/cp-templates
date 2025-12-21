@@ -1,4 +1,4 @@
-package graphs
+package datastructures
 
 type DSU struct {
 	fa, sz []int

@@ -1,4 +1,4 @@
-package graphs
+package datastructures
 
 type RollbackDSU struct {
 	fa, sz []int
