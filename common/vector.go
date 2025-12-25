@@ -79,6 +79,14 @@ func Vec2[T any](n, m int) Vec[Vec[T]] {
 	return v
 }
 
+func Vec3[T any](n, m, k int) Vec[Vec[Vec[T]]] {
+	v := make(Vec[Vec[Vec[T]]], n)
+	for i := range v {
+		v[i] = Vec2[T](m, k)
+	}
+	return v
+}
+
 func (v *Vec[T]) Copy() Vec[T] {
 	return slices.Clone(*v)
 }
