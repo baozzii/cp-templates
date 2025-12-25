@@ -63,25 +63,22 @@ func (v *Vec[T]) Fill(w T) {
 	}
 }
 
-func ToVec[T any](v []T) *Vec[T] {
-	t := Vec[T](v)
-	return &t
+func ToVec[T any](v []T) Vec[T] {
+	return Vec[T](v)
 }
 
-func Vec1[T any](n int) *Vec[T] {
-	v := make(Vec[T], n)
-	return &v
+func Vec1[T any](n int) Vec[T] {
+	return make(Vec[T], n)
 }
 
-func Vec2[T any](n, m int) *Vec[Vec[T]] {
+func Vec2[T any](n, m int) Vec[Vec[T]] {
 	v := make(Vec[Vec[T]], n)
 	for i := range v {
 		v[i] = make(Vec[T], m)
 	}
-	return &v
+	return v
 }
 
-func (v *Vec[T]) Copy() *Vec[T] {
-	nv := slices.Clone(*v)
-	return &nv
+func (v *Vec[T]) Copy() Vec[T] {
+	return slices.Clone(*v)
 }
