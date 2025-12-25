@@ -262,7 +262,7 @@ func (io *IO) Read(ptrs ...any) {
 			}
 		default:
 			rv := reflect.ValueOf(p)
-			if rv.Kind() == reflect.Ptr && rv.Elem().Kind() == reflect.Slice {
+			if rv.Kind() == reflect.Ptr && (rv.Elem().Kind() == reflect.Slice || rv.Elem().Kind() == reflect.Array) {
 				rd(rv.Elem())
 			}
 		}
@@ -341,7 +341,7 @@ func (io *IO) Write(a ...any) {
 			io.wbuf = append(io.wbuf, v...)
 		default:
 			rv := reflect.ValueOf(p)
-			if rv.Kind() == reflect.Slice {
+			if rv.Kind() == reflect.Slice || rv.Kind() == reflect.Array {
 				if rv.Type().Elem().Kind() == reflect.Slice {
 					for j := 0; j < rv.Len(); j++ {
 						if j+1 == rv.Len() {
