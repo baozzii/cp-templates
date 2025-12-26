@@ -103,22 +103,31 @@ func ToSlice3[T any](v Vec[Vec[Vec[T]]]) [][][]T {
 	return res
 }
 
-func Vec1[T any](n int) Vec[T] {
-	return make(Vec[T], n)
+func Vec1[T any](n ...int) Vec[T] {
+	if len(n) == 0 {
+		return make(Vec[T], 0)
+	}
+	return make(Vec[T], n[0])
 }
 
-func Vec2[T any](n, m int) Vec[Vec[T]] {
-	v := make(Vec[Vec[T]], n)
+func Vec2[T any](n ...int) Vec[Vec[T]] {
+	if len(n) == 0 {
+		return make(Vec[Vec[T]], 0)
+	}
+	v := make(Vec[Vec[T]], n[0])
 	for i := range v {
-		v[i] = make(Vec[T], m)
+		v[i] = Vec1[T](n[1:]...)
 	}
 	return v
 }
 
-func Vec3[T any](n, m, k int) Vec[Vec[Vec[T]]] {
-	v := make(Vec[Vec[Vec[T]]], n)
+func Vec3[T any](n ...int) Vec[Vec[Vec[T]]] {
+	if len(n) == 0 {
+		return make(Vec[Vec[Vec[T]]], 0)
+	}
+	v := make(Vec[Vec[Vec[T]]], n[0])
 	for i := range v {
-		v[i] = Vec2[T](m, k)
+		v[i] = Vec2[T](n[1:]...)
 	}
 	return v
 }
