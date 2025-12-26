@@ -76,6 +76,14 @@ func (h *HLD) Lca(u, v int) int {
 	return v
 }
 
+func (h *HLD) Dfn(u int) int {
+	return h.in[u]
+}
+
+func (h *HLD) Ord(u int) int {
+	return h.ord[u]
+}
+
 func (h *HLD) DoForPathDirected(u, v int, lca bool, f func(l, r int, rev bool)) {
 	type seg struct {
 		l, r int

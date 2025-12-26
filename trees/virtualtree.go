@@ -15,5 +15,9 @@ func VirtualTree(a []int, lca func(int, int) int, dfn func(int) int) [][2]int {
 		b[i] = [2]int{lca(a[i], a[i+1]), a[i+1]}
 	}
 	return b
+}
 
+func test() {
+	hld := NewHLD(NewTree(0))
+	t := VirtualTree([]int{}, hld.Lca, hld.Dfn)
 }
