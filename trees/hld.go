@@ -1,7 +1,5 @@
 package trees
 
-import "slices"
-
 type HLD struct {
 	t                          *Tree
 	in, out, hvy, top, sz, ord []int
@@ -169,19 +167,4 @@ func (h *HLD) MoveTo(u, v, k int) int {
 
 func (h *HLD) IsAnc(u, v int) bool {
 	return h.in[u] <= h.in[v] && h.out[u] >= h.out[v]
-}
-
-func (h *HLD) VirtualTree(a []int) [][2]int {
-	slices.SortFunc(a, func(x, y int) int { return h.in[x] - h.in[y] })
-	m := len(a)
-	for i := 0; i < m-1; i++ {
-		a = append(a, h.Lca(a[i], a[i+1]))
-	}
-	slices.SortFunc(a, func(x, y int) int { return h.in[x] - h.in[y] })
-	a = slices.Compact(a)
-	b := make([][2]int, len(a)-1)
-	for i := range b {
-		b[i] = [2]int{h.Lca(a[i], a[i+1]), a[i+1]}
-	}
-	return b
 }
