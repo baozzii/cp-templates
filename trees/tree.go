@@ -15,6 +15,12 @@ func (t *Tree) AddEdge(u, v int) {
 	t.adj[v] = append(t.adj[v], u)
 }
 
+func (t *Tree) FromEdges(edges [][]int, offset int) {
+	for _, e := range edges {
+		t.AddEdge(e[0]-offset, e[1]-offset)
+	}
+}
+
 func (t *Tree) SetRoot(r int) {
 	t.root = r
 }
