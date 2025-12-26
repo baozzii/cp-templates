@@ -2,7 +2,7 @@ package strings
 
 import "cmp"
 
-func MinExpression[T cmp.Ordered, E ~[]T](a E) int {
+func MinRep[T cmp.Ordered, E ~[]T](a E) int {
 	k, i, j := 0, 0, 1
 	n := len(a)
 	for k < n && i < n && j < n {
@@ -23,7 +23,7 @@ func MinExpression[T cmp.Ordered, E ~[]T](a E) int {
 	return min(i, j)
 }
 
-func MinExpressionFunc[T any, E ~[]T](a E, cmp func(T, T) int) int {
+func MinRepFunc[T any, E ~[]T](a E, cmp func(T, T) int) int {
 	k, i, j := 0, 0, 1
 	n := len(a)
 	for k < n && i < n && j < n {
