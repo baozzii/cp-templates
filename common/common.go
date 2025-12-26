@@ -3,10 +3,16 @@ package common
 import (
 	"cmp"
 	"fmt"
+	"strconv"
 )
 
 func ToString[T any](e T) string {
 	return fmt.Sprintf("%v", e)
+}
+
+func ToInt(s string) int {
+	x, _ := strconv.Atoi(s)
+	return x
 }
 
 func Chmax[T cmp.Ordered](x *T, y T) {
@@ -41,4 +47,10 @@ func Count[T comparable, E ~[]T](v E, e T) int {
 		}
 	}
 	return cnt
+}
+
+func Iota[T Integer, E ~[]T](v E, e T) {
+	for i := range v {
+		v[i] = e + T(i)
+	}
 }

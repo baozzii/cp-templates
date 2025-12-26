@@ -1,52 +1,41 @@
 package trees
 
 type Tree struct {
-	n       int32
-	root    int32
-	adj     [][]int32
-	pa      []int32
-	in, out []int32
-	dep     []int32
-	ord     []int32
+	n, root int
+	adj     [][]int
+	pa, dep []int
 }
 
 func NewTree(n int) *Tree {
-	return &Tree{int32(n), 0, make([][]int32, n), make([]int32, n), make([]int32, n), make([]int32, n), make([]int32, n), make([]int32, n)}
+	return &Tree{n, 0, make([][]int, n), make([]int, n), make([]int, n)}
 }
 
 func (t *Tree) AddEdge(u, v int) {
-	t.adj[u] = append(t.adj[u], int32(v))
-	t.adj[v] = append(t.adj[v], int32(u))
-}
-
-func (t *Tree) FromEdges(ed [][]int) {
-	for _, e := range ed {
-		t.AddEdge(e[0], e[1])
-	}
+	t.adj[u] = append(t.adj[u], v)
+	t.adj[v] = append(t.adj[v], u)
 }
 
 func (t *Tree) SetRoot(r int) {
-	t.root = int32(r)
+	t.root = r
 }
 
 func (t *Tree) Build() {
-	ts := int32(0)
-	var dfs func(int32, int32)
-	dfs = func(u, p int32) {
+	var dfs func(int, int)
+	dfs = func(u, p int) {
 		t.pa[u] = p
-		t.in[u] = ts
-		t.ord[ts] = u
-		ts++
-		var ch []int32
 		for _, v := range t.adj[u] {
 			if v != p {
-				ch = append(ch, v)
 				t.dep[v] = t.dep[u] + 1
 				dfs(v, u)
 			}
 		}
-		t.adj[u] = append([]int32{}, ch...)
-		t.out[u] = ts
+		l := len(t.adj[u])
+		for i := 0; i < l; i++ {
+			if t.adj[u][i] == p {
+				t.adj[u] = append(t.adj[u][:i], t.adj[u][i+1:]...)
+				break
+			}
+		}
 	}
 	dfs(t.root, -1)
 }
