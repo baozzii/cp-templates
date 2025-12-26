@@ -17,7 +17,10 @@ func VirtualTree(a []int, lca func(int, int) int, dfn func(int) int) [][2]int {
 	return b
 }
 
+/*
+Sample usage:
 func test() {
 	hld := NewHLD(NewTree(0))
-	t := VirtualTree([]int{}, hld.Lca, hld.Dfn)
+	_ = VirtualTree([]int{}, hld.Lca, hld.Dfn)
 }
+*/
