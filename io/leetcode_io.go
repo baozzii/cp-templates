@@ -106,3 +106,14 @@ func (io *LeetcodeIO) Run() {
 func (io *LeetcodeIO) execute(args []reflect.Value) []reflect.Value {
 	return io.fn.Call(args)
 }
+
+/*
+Usage:
+Program will read from stdin, one line per parameter.
+Supports multiple test cases.
+Program will write to stdout, one line per test case.
+
+func main() {
+	RegisterFunc(_FuncName_).Run()
+}
+*/

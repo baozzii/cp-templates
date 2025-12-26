@@ -38,3 +38,11 @@ func (s *Umap[T, K]) Values() Vec[K] {
 	}
 	return b
 }
+
+func Counter[T comparable, E ~[]T](v E) Umap[T, int] {
+	cnt := make(Umap[T, int])
+	for _, w := range v {
+		cnt[w]++
+	}
+	return cnt
+}

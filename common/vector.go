@@ -63,8 +63,44 @@ func (v *Vec[T]) Fill(w T) {
 	}
 }
 
-func ToVec[T any](v []T) Vec[T] {
+func ToVec1[T any, E ~[]T](v E) Vec[T] {
 	return Vec[T](v)
+}
+
+func ToSlice1[T any](v Vec[T]) []T {
+	return []T(v)
+}
+
+func ToVec2[T any, E ~[][]T](v E) Vec[Vec[T]] {
+	res := make(Vec[Vec[T]], len(v))
+	for i := range v {
+		res[i] = ToVec1(v[i])
+	}
+	return res
+}
+
+func ToSlice2[T any](v Vec[Vec[T]]) [][]T {
+	res := make([][]T, len(v))
+	for i := range v {
+		res[i] = ToSlice1(v[i])
+	}
+	return res
+}
+
+func ToVec3[T any, E ~[][][]T](v E) Vec[Vec[Vec[T]]] {
+	res := make(Vec[Vec[Vec[T]]], len(v))
+	for i := range v {
+		res[i] = ToVec2(v[i])
+	}
+	return res
+}
+
+func ToSlice3[T any](v Vec[Vec[Vec[T]]]) [][][]T {
+	res := make([][][]T, len(v))
+	for i := range v {
+		res[i] = ToSlice2(v[i])
+	}
+	return res
 }
 
 func Vec1[T any](n int) Vec[T] {

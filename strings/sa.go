@@ -11,7 +11,7 @@ type SuffixArray struct {
 	ht []int32
 }
 
-func NewSuffixArrayFromBytes(s []byte) *SuffixArray {
+func NewSuffixArrayWithBytes(s []byte) *SuffixArray {
 	sa := (*struct {
 		_  []byte
 		sa []int32
@@ -35,7 +35,7 @@ func NewSuffixArrayFromBytes(s []byte) *SuffixArray {
 	return &SuffixArray{sa, rk, ht}
 }
 
-func NewSuffixArrayFromInts(a []int32) *SuffixArray {
+func NewSuffixArrayWithInts(a []int32) *SuffixArray {
 	n := len(a)
 	_s := make([]byte, 0, n*4)
 	for _, v := range a {
