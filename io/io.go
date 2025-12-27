@@ -2,6 +2,7 @@ package io
 
 import (
 	. "io"
+	"math"
 	"os"
 	"reflect"
 	"strconv"
@@ -25,7 +26,7 @@ func NewStdIO() *IO {
 
 func (io *IO) read_byte() byte {
 	if io.i == io.n {
-		io.n, _ = os.Stdin.Read(io.rbuf)
+		io.n, _ = io.in.Read(io.rbuf)
 		if io.n == 0 {
 			return 0
 		}
@@ -132,12 +133,19 @@ func (io *IO) Read(ptrs ...any) {
 						neg = true
 					}
 				}
+				var y uint
 				var x int
 				for ; '0' <= b && b <= '9'; b = io.read_byte() {
-					x = x*10 + int(b&15)
+					y = y*10 + uint(b&15)
 				}
 				if neg {
-					x = -x
+					if y == math.MaxInt+1 {
+						x = math.MinInt
+					} else {
+						x = -int(y)
+					}
+				} else {
+					x = int(y)
 				}
 				*v = x
 			}
@@ -216,12 +224,19 @@ func (io *IO) Read(ptrs ...any) {
 						neg = true
 					}
 				}
+				var y uint
 				var x int64
 				for ; '0' <= b && b <= '9'; b = io.read_byte() {
-					x = x*10 + int64(b&15)
+					y = y*10 + uint(b&15)
 				}
 				if neg {
-					x = -x
+					if y == math.MaxInt64+1 {
+						x = math.MinInt64
+					} else {
+						x = -int64(y)
+					}
+				} else {
+					x = int64(y)
 				}
 				*v = x
 			}
@@ -287,6 +302,9 @@ func (io *IO) Write(a ...any) {
 	itos := func(v int64) []byte {
 		if v == 0 {
 			return []byte{'0'}
+		}
+		if v == math.MinInt64 {
+			return []byte("-9223372036854775808")
 		}
 		neg := v < 0
 		if neg {
