@@ -4,7 +4,35 @@ import (
 	"cmp"
 	"fmt"
 	"strconv"
+	"unsafe"
 )
+
+type NumericLimit[T Integer] struct{}
+
+func Limit[T Integer]() NumericLimit[T] {
+	return struct{}{}
+}
+
+func (NumericLimit[T]) Max() T {
+	var z T
+	if (^z) < 0 {
+		b := uint(unsafe.Sizeof(z) * 8)
+		u := uint(1)<<(b-1) - 1
+		return T(u)
+	} else {
+		return ^z
+	}
+}
+
+func (NumericLimit[T]) Min() T {
+	var z T
+	if (^z) < 0 {
+		b := uint(unsafe.Sizeof(z) * 8)
+		u := uint(1) << (b - 1)
+		return T(-int(u))
+	}
+	return 0
+}
 
 func ToString[T any](e T) string {
 	return fmt.Sprintf("%v", e)
