@@ -4,11 +4,13 @@ import (
 	"cmp"
 	"fmt"
 	. "io"
+	"math"
 	"math/bits"
 	"os"
 	"reflect"
 	"slices"
 	"strconv"
+	"unsafe"
 )
 
 type IO struct {
@@ -29,7 +31,7 @@ func NewStdIO() *IO {
 
 func (io *IO) read_byte() byte {
 	if io.i == io.n {
-		io.n, _ = os.Stdin.Read(io.rbuf)
+		io.n, _ = io.in.Read(io.rbuf)
 		if io.n == 0 {
 			return 0
 		}
@@ -136,12 +138,19 @@ func (io *IO) Read(ptrs ...any) {
 						neg = true
 					}
 				}
+				var y uint
 				var x int
 				for ; '0' <= b && b <= '9'; b = io.read_byte() {
-					x = x*10 + int(b&15)
+					y = y*10 + uint(b&15)
 				}
 				if neg {
-					x = -x
+					if y == math.MaxInt+1 {
+						x = math.MinInt
+					} else {
+						x = -int(y)
+					}
+				} else {
+					x = int(y)
 				}
 				*v = x
 			}
@@ -220,12 +229,19 @@ func (io *IO) Read(ptrs ...any) {
 						neg = true
 					}
 				}
+				var y uint
 				var x int64
 				for ; '0' <= b && b <= '9'; b = io.read_byte() {
-					x = x*10 + int64(b&15)
+					y = y*10 + uint(b&15)
 				}
 				if neg {
-					x = -x
+					if y == math.MaxInt64+1 {
+						x = math.MinInt64
+					} else {
+						x = -int64(y)
+					}
+				} else {
+					x = int64(y)
 				}
 				*v = x
 			}
@@ -291,6 +307,9 @@ func (io *IO) Write(a ...any) {
 	itos := func(v int64) []byte {
 		if v == 0 {
 			return []byte{'0'}
+		}
+		if v == math.MinInt64 {
+			return []byte("-9223372036854775808")
 		}
 		neg := v < 0
 		if neg {
@@ -501,6 +520,48 @@ func Count[T comparable, E ~[]T](v E, e T) int {
 	return cnt
 }
 
+func Iota[T Integer, E ~[]T](v E, e T) {
+	for i := range v {
+		v[i] = e + T(i)
+	}
+}
+
+func Cond[T any](cond bool, x, y T) T {
+	if cond {
+		return x
+	}
+	return y
+}
+
+type Void struct{}
+
+type NumericLimit[T Integer] struct{}
+
+func Limit[T Integer]() NumericLimit[T] {
+	return struct{}{}
+}
+
+func (NumericLimit[T]) Max() T {
+	var z T
+	if (^z) < 0 {
+		b := uint(unsafe.Sizeof(z) * 8)
+		u := uint(1)<<(b-1) - 1
+		return T(u)
+	} else {
+		return ^z
+	}
+}
+
+func (NumericLimit[T]) Min() T {
+	var z T
+	if (^z) < 0 {
+		b := uint(unsafe.Sizeof(z) * 8)
+		u := uint(1) << (b - 1)
+		return T(-int(u))
+	}
+	return 0
+}
+
 type Vec[T any] []T
 
 func (v *Vec[T]) Size() int {
@@ -600,22 +661,31 @@ func ToSlice3[T any](v Vec[Vec[Vec[T]]]) [][][]T {
 	return res
 }
 
-func Vec1[T any](n int) Vec[T] {
-	return make(Vec[T], n)
+func Vec1[T any](n ...int) Vec[T] {
+	if len(n) == 0 {
+		return make(Vec[T], 0)
+	}
+	return make(Vec[T], n[0])
 }
 
-func Vec2[T any](n, m int) Vec[Vec[T]] {
-	v := make(Vec[Vec[T]], n)
+func Vec2[T any](n ...int) Vec[Vec[T]] {
+	if len(n) == 0 {
+		return make(Vec[Vec[T]], 0)
+	}
+	v := make(Vec[Vec[T]], n[0])
 	for i := range v {
-		v[i] = make(Vec[T], m)
+		v[i] = Vec1[T](n[1:]...)
 	}
 	return v
 }
 
-func Vec3[T any](n, m, k int) Vec[Vec[Vec[T]]] {
-	v := make(Vec[Vec[Vec[T]]], n)
+func Vec3[T any](n ...int) Vec[Vec[Vec[T]]] {
+	if len(n) == 0 {
+		return make(Vec[Vec[Vec[T]]], 0)
+	}
+	v := make(Vec[Vec[Vec[T]]], n[0])
 	for i := range v {
-		v[i] = Vec2[T](m, k)
+		v[i] = Vec2[T](n[1:]...)
 	}
 	return v
 }
