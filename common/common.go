@@ -84,3 +84,10 @@ func Iota[T Integer, E ~[]T](v E, e T) {
 		v[i] = e + T(i)
 	}
 }
+
+func Cond[T any](cond bool, x, y T) T {
+	if cond {
+		return x
+	}
+	return y
+}
