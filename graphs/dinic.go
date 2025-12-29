@@ -18,7 +18,7 @@ type mfEdge[Cap Integer] struct {
 	cap Cap
 }
 
-type Edge[Cap Integer] struct {
+type MFEdge[Cap Integer] struct {
 	from int
 	to   int
 	cap  Cap
@@ -73,12 +73,12 @@ func (mf *MFGraph[Cap]) AddEdge(from, to int, cap Cap) int {
 	return id
 }
 
-func (mf *MFGraph[Cap]) GetEdge(i int) Edge[Cap] {
+func (mf *MFGraph[Cap]) GetEdge(i int) MFEdge[Cap] {
 	from := int(mf.posFrom[i])
 	idx := int(mf.posIdx[i])
 	e := mf.g[from][idx]
 	re := mf.g[int(e.to)][int(e.rev)]
-	return Edge[Cap]{
+	return MFEdge[Cap]{
 		from: from,
 		to:   int(e.to),
 		cap:  e.cap + re.cap,
@@ -86,9 +86,9 @@ func (mf *MFGraph[Cap]) GetEdge(i int) Edge[Cap] {
 	}
 }
 
-func (mf *MFGraph[Cap]) Edges() []Edge[Cap] {
+func (mf *MFGraph[Cap]) Edges() []MFEdge[Cap] {
 	m := len(mf.posFrom)
-	res := make([]Edge[Cap], 0, m)
+	res := make([]MFEdge[Cap], 0, m)
 	for i := 0; i < m; i++ {
 		res = append(res, mf.GetEdge(i))
 	}

@@ -7,6 +7,8 @@ import (
 	"unsafe"
 )
 
+type Void struct{}
+
 type NumericLimit[T Integer] struct{}
 
 func Limit[T Integer]() NumericLimit[T] {
