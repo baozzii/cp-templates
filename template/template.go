@@ -419,6 +419,91 @@ type ComplexNumber interface {
 		~complex64 | ~complex128
 }
 
+type Void struct{}
+
+type NumericLimit[T Integer] struct{}
+
+func Limit[T Integer]() NumericLimit[T] {
+	return struct{}{}
+}
+
+func (NumericLimit[T]) Max() T {
+	var z T
+	if (^z) < 0 {
+		b := uint(unsafe.Sizeof(z) * 8)
+		u := uint(1)<<(b-1) - 1
+		return T(u)
+	} else {
+		return ^z
+	}
+}
+
+func (NumericLimit[T]) Min() T {
+	var z T
+	if (^z) < 0 {
+		b := uint(unsafe.Sizeof(z) * 8)
+		u := uint(1) << (b - 1)
+		return T(-int(u))
+	}
+	return 0
+}
+
+func ToString[T any](e T) string {
+	return fmt.Sprintf("%v", e)
+}
+
+func ToInt(s string) int {
+	x, _ := strconv.Atoi(s)
+	return x
+}
+
+func Chmax[T cmp.Ordered](x *T, y T) {
+	*x = max(*x, y)
+}
+
+func Chmin[T cmp.Ordered](x *T, y T) {
+	*x = min(*x, y)
+}
+
+func Sum[T ComplexNumber, E ~[]T](v E) T {
+	var s T
+	for _, w := range v {
+		s += w
+	}
+	return s
+}
+
+func PreSum[T ComplexNumber, E ~[]T](v E) E {
+	p := make(E, len(v)+1)
+	for i, w := range v {
+		p[i+1] = p[i] + w
+	}
+	return p
+}
+
+func Count[T comparable, E ~[]T](v E, e T) int {
+	cnt := 0
+	for _, w := range v {
+		if w == e {
+			cnt++
+		}
+	}
+	return cnt
+}
+
+func Iota[T Integer, E ~[]T](v E, e T) {
+	for i := range v {
+		v[i] = e + T(i)
+	}
+}
+
+func Cond[T any](cond bool, x, y T) T {
+	if cond {
+		return x
+	}
+	return y
+}
+
 func Ctz[T Integer](x T) int {
 	return bits.TrailingZeros(uint(x))
 }
@@ -480,86 +565,6 @@ func Exgcd[T Integer](a, b T) (T, T, T) {
 	}
 	d, x2, y2 := Exgcd(b, a%b)
 	return d, y2, x2 - (a/b)*y2
-}
-
-func ToString[T any](e T) string {
-	return fmt.Sprintf("%v", e)
-}
-
-func Chmax[T cmp.Ordered](x *T, y T) {
-	*x = max(*x, y)
-}
-
-func Chmin[T cmp.Ordered](x *T, y T) {
-	*x = min(*x, y)
-}
-
-func Sum[T ComplexNumber, E ~[]T](v E) T {
-	var s T
-	for _, w := range v {
-		s += w
-	}
-	return s
-}
-
-func PreSum[T ComplexNumber, E ~[]T](v E) E {
-	p := make(E, len(v)+1)
-	for i, w := range v {
-		p[i+1] = p[i] + w
-	}
-	return p
-}
-
-func Count[T comparable, E ~[]T](v E, e T) int {
-	cnt := 0
-	for _, w := range v {
-		if w == e {
-			cnt++
-		}
-	}
-	return cnt
-}
-
-func Iota[T Integer, E ~[]T](v E, e T) {
-	for i := range v {
-		v[i] = e + T(i)
-	}
-}
-
-func Cond[T any](cond bool, x, y T) T {
-	if cond {
-		return x
-	}
-	return y
-}
-
-type Void struct{}
-
-type NumericLimit[T Integer] struct{}
-
-func Limit[T Integer]() NumericLimit[T] {
-	return struct{}{}
-}
-
-func (NumericLimit[T]) Max() T {
-	var z T
-	if (^z) < 0 {
-		b := uint(unsafe.Sizeof(z) * 8)
-		u := uint(1)<<(b-1) - 1
-		return T(u)
-	} else {
-		return ^z
-	}
-}
-
-func (NumericLimit[T]) Min() T {
-	var z T
-	if (^z) < 0 {
-		b := uint(unsafe.Sizeof(z) * 8)
-		u := uint(1) << (b - 1)
-		return T(-int(u))
-	}
-	return 0
 }
 
 type Vec[T any] []T
@@ -692,6 +697,11 @@ func Vec3[T any](n ...int) Vec[Vec[Vec[T]]] {
 
 func (v *Vec[T]) Copy() Vec[T] {
 	return slices.Clone(*v)
+}
+
+func (v *Vec[T]) Slice(i, j int) Vec[T] {
+	w := (*v)[i:j]
+	return w.Copy()
 }
 
 type Uset[T comparable] map[T]struct{}

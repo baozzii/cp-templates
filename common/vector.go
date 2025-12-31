@@ -135,3 +135,8 @@ func Vec3[T any](n ...int) Vec[Vec[Vec[T]]] {
 func (v *Vec[T]) Copy() Vec[T] {
 	return slices.Clone(*v)
 }
+
+func (v *Vec[T]) Slice(i, j int) Vec[T] {
+	w := (*v)[i:j]
+	return w.Copy()
+}
