@@ -287,3 +287,29 @@ func (t *AVL[T, M]) FindGe(x, d T) T {
 func (t *AVL[T, M]) Size() int {
 	return int(t.t[t.root].s)
 }
+
+func (t *AVL[T, M]) Min() T {
+	o := t.root
+	for {
+		if t.t[o].l != 0 {
+			o = t.t[o].l
+		} else if t.t[o].r != 0 {
+			o = t.t[o].r
+		} else {
+			return t.t[o].key
+		}
+	}
+}
+
+func (t *AVL[T, M]) Max() T {
+	o := t.root
+	for {
+		if t.t[o].r != 0 {
+			o = t.t[o].r
+		} else if t.t[o].l != 0 {
+			o = t.t[o].l
+		} else {
+			return t.t[o].key
+		}
+	}
+}
