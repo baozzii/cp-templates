@@ -12,8 +12,8 @@ type LiChaoSeg[K Integer, T Integer] struct {
 	def   LichaoLine[K, T]
 
 	lines []LichaoLine[K, T]
-	lc    []int
-	rc    []int
+	lc    []int32
+	rc    []int32
 }
 
 func NewLiChaoSeg[K Integer, T Integer](L, R K, isMin bool) *LiChaoSeg[K, T] {
@@ -24,16 +24,16 @@ func NewLiChaoSeg[K Integer, T Integer](L, R K, isMin bool) *LiChaoSeg[K, T] {
 		t.def = LichaoLine[K, T]{0, Limit[T]().Min()}
 	}
 	t.lines = []LichaoLine[K, T]{t.def}
-	t.lc = []int{-1}
-	t.rc = []int{-1}
+	t.lc = []int32{-1}
+	t.rc = []int32{-1}
 	return t
 }
 
-func (t *LiChaoSeg[K, T]) newNode() int {
+func (t *LiChaoSeg[K, T]) new_node() int32 {
 	t.lines = append(t.lines, t.def)
 	t.lc = append(t.lc, -1)
 	t.rc = append(t.rc, -1)
-	return len(t.lines) - 1
+	return int32(len(t.lines) - 1)
 }
 
 func (t *LiChaoSeg[K, T]) Insert(f LichaoLine[K, T]) { t.InsertSeg(t.L, t.R, f) }
@@ -53,10 +53,9 @@ func (t *LiChaoSeg[K, T]) InsertSeg(a, b K, f LichaoLine[K, T]) {
 		}
 		return x > y
 	}
-	var addLine func(v int, l, r K, g LichaoLine[K, T])
-	addLine = func(v int, l, r K, g LichaoLine[K, T]) {
+	var addLine func(int32, K, K, LichaoLine[K, T])
+	addLine = func(v int32, l, r K, g LichaoLine[K, T]) {
 		m := l + (r-l)/2
-
 		if cmp(g.Eval(m), t.lines[v].Eval(m)) {
 			t.lines[v], g = g, t.lines[v]
 		}
@@ -66,22 +65,21 @@ func (t *LiChaoSeg[K, T]) InsertSeg(a, b K, f LichaoLine[K, T]) {
 		if !cmp(g.Eval(l), t.lines[v].Eval(l)) && !cmp(g.Eval(r), t.lines[v].Eval(r)) {
 			return
 		}
-
 		if cmp(g.Eval(l), t.lines[v].Eval(l)) {
 			if t.lc[v] == -1 {
-				t.lc[v] = t.newNode()
+				t.lc[v] = t.new_node()
 			}
 			addLine(t.lc[v], l, m, g)
 		} else {
 			if t.rc[v] == -1 {
-				t.rc[v] = t.newNode()
+				t.rc[v] = t.new_node()
 			}
 			addLine(t.rc[v], m+1, r, g)
 		}
 	}
 
-	var dfs func(v int, l, r K)
-	dfs = func(v int, l, r K) {
+	var dfs func(int32, K, K)
+	dfs = func(v int32, l, r K) {
 		if r < a || b < l {
 			return
 		}
@@ -97,10 +95,10 @@ func (t *LiChaoSeg[K, T]) InsertSeg(a, b K, f LichaoLine[K, T]) {
 		}
 		m := l + (r-l)/2
 		if t.lc[v] == -1 {
-			t.lc[v] = t.newNode()
+			t.lc[v] = t.new_node()
 		}
 		if t.rc[v] == -1 {
-			t.rc[v] = t.newNode()
+			t.rc[v] = t.new_node()
 		}
 		dfs(t.lc[v], l, m)
 		dfs(t.rc[v], m+1, r)
@@ -115,8 +113,8 @@ func (t *LiChaoSeg[K, T]) Query(x K) T {
 		}
 		return a > b
 	}
-	var dfs func(v int, l, r K) T
-	dfs = func(v int, l, r K) T {
+	var dfs func(int32, K, K) T
+	dfs = func(v int32, l, r K) T {
 		if v == -1 {
 			return t.def.Eval(x)
 		}
@@ -125,12 +123,7 @@ func (t *LiChaoSeg[K, T]) Query(x K) T {
 			return res
 		}
 		m := l + (r-l)/2
-		var sub T
-		if x <= m {
-			sub = dfs(t.lc[v], l, m)
-		} else {
-			sub = dfs(t.rc[v], m+1, r)
-		}
+		sub := Cond(x <= m, dfs(t.lc[v], l, m), dfs(t.rc[v], m+1, r))
 		if cmp(sub, res) {
 			return sub
 		}
