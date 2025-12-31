@@ -1,6 +1,8 @@
 package graphs
 
-import . "cp-templates/common"
+import (
+	. "cp-templates/common"
+)
 
 type WeightType interface {
 	Integer | Void
@@ -29,6 +31,20 @@ func (g *Graph[T]) AddEdge(u, v int) {
 	g.adj[u] = append(g.adj[u], Edge[T]{w, int32(v)})
 }
 
+func (g *Graph[T]) FromEdges(edges [][]int, offset int) {
+	for _, e := range edges {
+		g.AddEdge(e[0]-offset, e[1]-offset)
+	}
+}
+
 func (g *Graph[T]) AddWeightedEdge(u, v int, w T) {
 	g.adj[u] = append(g.adj[u], Edge[T]{w, int32(v)})
+}
+
+func (g *Graph[T]) FromWeightedEdges(edges [][]int, offset int) {
+	for _, e := range edges {
+		if w, ok := any(e[2]).(T); ok {
+			g.AddWeightedEdge(e[0]-offset, e[1]-offset, w)
+		}
+	}
 }
