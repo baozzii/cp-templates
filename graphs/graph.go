@@ -2,25 +2,33 @@ package graphs
 
 import . "cp-templates/common"
 
-type Edge[T Integer | Void] struct {
-	w T
-	v int
+type WeightType interface {
+	Integer | Void
 }
 
-type Graph[T Integer | Void] struct {
+type Edge[T WeightType] struct {
+	w T
+	v int32
+}
+
+func (e Edge[T]) Get() (int, T) {
+	return int(e.v), e.w
+}
+
+type Graph[T WeightType] struct {
 	n   int
 	adj [][]Edge[T]
 }
 
-func NewGraph[T Integer | Void](n int) *Graph[T] {
+func NewGraph[T WeightType](n int) *Graph[T] {
 	return &Graph[T]{n, make([][]Edge[T], n)}
 }
 
 func (g *Graph[T]) AddEdge(u, v int) {
 	var w T
-	g.adj[u] = append(g.adj[u], Edge[T]{w, v})
+	g.adj[u] = append(g.adj[u], Edge[T]{w, int32(v)})
 }
 
 func (g *Graph[T]) AddWeightedEdge(u, v int, w T) {
-	g.adj[u] = append(g.adj[u], Edge[T]{w, v})
+	g.adj[u] = append(g.adj[u], Edge[T]{w, int32(v)})
 }
