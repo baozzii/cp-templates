@@ -2,96 +2,139 @@ package datastructures
 
 import . "cp-templates/common"
 
-type LichaoInfo[K Integer, T RealNumber] interface {
-	Eval(K) T
+type LichaoLine[K Integer, T Integer] struct{ k, b T }
+
+func (ln LichaoLine[K, T]) Eval(x K) T { return ln.k*T(x) + ln.b }
+
+type LiChaoSeg[K Integer, T Integer] struct {
+	L, R  K
+	isMin bool
+	def   LichaoLine[K, T]
+
+	lines []LichaoLine[K, T]
+	lc    []int
+	rc    []int
 }
 
-type LichaoNode[K Integer, T RealNumber, M LichaoInfo[K, T]] struct {
-	l, r *LichaoNode[K, T, M]
-	f    M
-}
-
-type Lichao[K Integer, T RealNumber, M LichaoInfo[K, T]] struct {
-	n     K
-	t     *LichaoNode[K, T, M]
-	def   M
-	ismin bool
-}
-
-func NewLichao[K Integer, T RealNumber, M LichaoInfo[K, T]](n K, ismin bool, def M) *Lichao[K, T, M] {
-	return &Lichao[K, T, M]{n: n, t: nil, def: def, ismin: ismin}
-}
-
-func (lc *Lichao[K, T, M]) cmp(a, b T) bool {
-	if lc.ismin {
-		return a < b
+func NewLiChaoSeg[K Integer, T Integer](L, R K, isMin bool) *LiChaoSeg[K, T] {
+	t := &LiChaoSeg[K, T]{L: L, R: R, isMin: isMin}
+	if isMin {
+		t.def = LichaoLine[K, T]{0, Limit[T]().Max()}
+	} else {
+		t.def = LichaoLine[K, T]{0, Limit[T]().Min()}
 	}
-	return a > b
+	t.lines = []LichaoLine[K, T]{t.def}
+	t.lc = []int{-1}
+	t.rc = []int{-1}
+	return t
 }
 
-func (lc *Lichao[K, T, M]) Insert(f M) {
-	lc.InsertSeg(0, lc.n, f)
+func (t *LiChaoSeg[K, T]) newNode() int {
+	t.lines = append(t.lines, t.def)
+	t.lc = append(t.lc, -1)
+	t.rc = append(t.rc, -1)
+	return len(t.lines) - 1
 }
 
-func (lc *Lichao[K, T, M]) InsertSeg(L, R K, f M) {
-	var dfs func(p **LichaoNode[K, T, M], l, r K)
-	dfs = func(p **LichaoNode[K, T, M], l, r K) {
-		if l >= R || r <= L {
+func (t *LiChaoSeg[K, T]) Insert(f LichaoLine[K, T]) { t.InsertSeg(t.L, t.R, f) }
+
+func (t *LiChaoSeg[K, T]) InsertSeg(a, b K, f LichaoLine[K, T]) {
+	if b < t.L || t.R < a {
+		return
+	}
+	a = max(a, t.L)
+	b = min(b, t.R)
+	if a > b {
+		return
+	}
+	cmp := func(x, y T) bool {
+		if t.isMin {
+			return x < y
+		}
+		return x > y
+	}
+	var addLine func(v int, l, r K, g LichaoLine[K, T])
+	addLine = func(v int, l, r K, g LichaoLine[K, T]) {
+		m := l + (r-l)/2
+
+		if cmp(g.Eval(m), t.lines[v].Eval(m)) {
+			t.lines[v], g = g, t.lines[v]
+		}
+		if l == r {
 			return
 		}
-		if *p == nil {
-			*p = &LichaoNode[K, T, M]{f: lc.def}
+		if !cmp(g.Eval(l), t.lines[v].Eval(l)) && !cmp(g.Eval(r), t.lines[v].Eval(r)) {
+			return
 		}
-		node := *p
-		m := (l + r) / 2
-		if L <= l && r <= R {
-			if lc.cmp(f.Eval(m), node.f.Eval(m)) {
-				node.f, f = f, node.f
+
+		if cmp(g.Eval(l), t.lines[v].Eval(l)) {
+			if t.lc[v] == -1 {
+				t.lc[v] = t.newNode()
 			}
-			if r-l == 1 {
-				return
-			}
-			if lc.cmp(f.Eval(l), node.f.Eval(l)) {
-				dfs(&node.l, l, m)
-			} else {
-				dfs(&node.r, m, r)
-			}
+			addLine(t.lc[v], l, m, g)
 		} else {
-			if r-l == 1 {
-				if lc.cmp(f.Eval(l), node.f.Eval(l)) {
-					node.f = f
-				}
-				return
+			if t.rc[v] == -1 {
+				t.rc[v] = t.newNode()
 			}
-			dfs(&node.l, l, m)
-			dfs(&node.r, m, r)
+			addLine(t.rc[v], m+1, r, g)
 		}
 	}
 
-	dfs(&lc.t, 0, lc.n)
+	var dfs func(v int, l, r K)
+	dfs = func(v int, l, r K) {
+		if r < a || b < l {
+			return
+		}
+		if a <= l && r <= b {
+			addLine(v, l, r, f)
+			return
+		}
+		if l == r {
+			if cmp(f.Eval(l), t.lines[v].Eval(l)) {
+				t.lines[v] = f
+			}
+			return
+		}
+		m := l + (r-l)/2
+		if t.lc[v] == -1 {
+			t.lc[v] = t.newNode()
+		}
+		if t.rc[v] == -1 {
+			t.rc[v] = t.newNode()
+		}
+		dfs(t.lc[v], l, m)
+		dfs(t.rc[v], m+1, r)
+	}
+	dfs(0, t.L, t.R)
 }
 
-func (lc *Lichao[K, T, M]) Query(x K) T {
-	var dfs func(p *LichaoNode[K, T, M], l, r K) T
-	dfs = func(p *LichaoNode[K, T, M], l, r K) T {
-		if p == nil {
-			return lc.def.Eval(x)
+func (t *LiChaoSeg[K, T]) Query(x K) T {
+	cmp := func(a, b T) bool {
+		if t.isMin {
+			return a < b
 		}
-		res := p.f.Eval(x)
-		if r-l == 1 {
+		return a > b
+	}
+	var dfs func(v int, l, r K) T
+	dfs = func(v int, l, r K) T {
+		if v == -1 {
+			return t.def.Eval(x)
+		}
+		res := t.lines[v].Eval(x)
+		if l == r {
 			return res
 		}
-		m := (l + r) / 2
+		m := l + (r-l)/2
 		var sub T
-		if x < m {
-			sub = dfs(p.l, l, m)
+		if x <= m {
+			sub = dfs(t.lc[v], l, m)
 		} else {
-			sub = dfs(p.r, m, r)
+			sub = dfs(t.rc[v], m+1, r)
 		}
-		if lc.cmp(sub, res) {
+		if cmp(sub, res) {
 			return sub
 		}
 		return res
 	}
-	return dfs(lc.t, 0, lc.n)
+	return dfs(0, t.L, t.R)
 }
