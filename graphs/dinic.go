@@ -98,8 +98,8 @@ func (mf *MFGraph[Cap]) Edges() []MFEdge[Cap] {
 func (mf *MFGraph[Cap]) ChangeEdge(i int, newCap, newFlow Cap) {
 	from := int(mf.posFrom[i])
 	idx := int(mf.posIdx[i])
-	e := &mf.g[from][idx]
-	re := &mf.g[int(e.to)][int(e.rev)]
+	e := mf.g[from][idx]
+	re := mf.g[int(e.to)][int(e.rev)]
 	e.cap = newCap - newFlow
 	re.cap = newFlow
 }
