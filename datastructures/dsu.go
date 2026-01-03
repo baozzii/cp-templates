@@ -1,25 +1,26 @@
 package datastructures
 
 type DSU struct {
-	fa, sz []int
+	fa, sz []int32
 }
 
 func NewDSU(n int) *DSU {
-	fa := make([]int, n)
-	sz := make([]int, n)
+	fa := make([]int32, n)
+	sz := make([]int32, n)
 	for i := range fa {
-		fa[i] = i
+		fa[i] = int32(i)
 		sz[i] = 1
 	}
 	return &DSU{fa, sz}
 }
 
-func (dsu *DSU) Find(u int) int {
-	if u == dsu.fa[u] {
+func (dsu *DSU) Find(_u int) int {
+	u := int(_u)
+	if u == int(dsu.fa[u]) {
 		return u
 	}
-	dsu.fa[u] = dsu.Find(dsu.fa[u])
-	return dsu.fa[u]
+	dsu.fa[u] = int32(dsu.Find(int(dsu.fa[u])))
+	return int(dsu.fa[u])
 }
 
 func (dsu *DSU) Merge(u, v int) bool {
@@ -32,7 +33,7 @@ func (dsu *DSU) Merge(u, v int) bool {
 		u, v = v, u
 	}
 	dsu.sz[v] += dsu.sz[u]
-	dsu.fa[u] = v
+	dsu.fa[u] = int32(v)
 	return true
 }
 
