@@ -13,7 +13,7 @@ func NewPriorityQueue[T any, M PriorityQueueInfo[T]](m M) *PriorityQueue[T, M] {
 	return &PriorityQueue[T, M]{make([]T, 0), m.cmp}
 }
 
-func NewPriorityQueueWith[T any, M PriorityQueueInfo[T]](a []T) *PriorityQueue[T, M] {
+func NewPriorityQueueWith[T any, M PriorityQueueInfo[T], E ~[]T](a E) *PriorityQueue[T, M] {
 	hp := make([]T, len(a))
 	copy(hp, a)
 	pq := &PriorityQueue[T, M]{hp: hp}
