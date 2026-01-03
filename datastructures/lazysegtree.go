@@ -41,7 +41,7 @@ func (seg *LazySegtree[T, K, M]) push(k int) {
 	seg.lz[k] = seg.id()
 }
 
-func NewLazySegtreeWith[T, K any, M LazySegtreeInfo[T, K]](a []T, m M) *LazySegtree[T, K, M] {
+func NewLazySegtreeWith[T, K any, M LazySegtreeInfo[T, K], E ~[]T](a E, m M) *LazySegtree[T, K, M] {
 	n := len(a)
 	size := 1
 	for size < n {

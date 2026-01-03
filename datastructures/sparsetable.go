@@ -17,7 +17,7 @@ type SparseTable[T any, M SparseTableInfo[T]] struct {
 	e  func() T
 }
 
-func NewSparseTableWith[T any, M SparseTableInfo[T]](a []T, m M) *SparseTable[T, M] {
+func NewSparseTableWith[T any, M SparseTableInfo[T], E ~[]T](a E, m M) *SparseTable[T, M] {
 	op := m.op
 	e := m.e
 	n := len(a)

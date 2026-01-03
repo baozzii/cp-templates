@@ -18,7 +18,7 @@ func (seg *Segtree[T, M]) pushup(i int) {
 	seg.d[i] = seg.op(seg.d[i<<1], seg.d[i<<1|1])
 }
 
-func NewSegtreeWith[T any, M SegtreeInfo[T]](a []T, m M) *Segtree[T, M] {
+func NewSegtreeWith[T any, M SegtreeInfo[T], E ~[]T](a E, m M) *Segtree[T, M] {
 	size := 1
 	n := len(a)
 	for size < n {
