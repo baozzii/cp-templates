@@ -1,3 +1,5 @@
+// https://github.com/baozzii/cp-templates
+
 package main
 
 import (
