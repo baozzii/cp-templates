@@ -313,3 +313,28 @@ func (t *AVL[T, M]) Max() T {
 		}
 	}
 }
+
+// Only usable after Go1.23
+// func (t *AVL[T, M]) Values() iter.Seq[T] {
+// 	return func(yield func(T) bool) {
+// 		var dfs func(int32) bool
+// 		dfs = func(u int32) bool {
+// 			if u == 0 {
+// 				return true
+// 			}
+// 			if !dfs(t.t[u].l) {
+// 				return false
+// 			}
+// 			for range t.t[u].cnt {
+// 				if !yield(t.t[u].key) {
+// 					return false
+// 				}
+// 			}
+// 			if !dfs(t.t[u].r) {
+// 				return false
+// 			}
+// 			return true
+// 		}
+// 		dfs(t.root)
+// 	}
+// }
