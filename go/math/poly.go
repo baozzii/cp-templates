@@ -6,7 +6,7 @@ https://judge.yosupo.jp/submission/336315 PolyInv
 https://judge.yosupo.jp/submission/336316 PolyLog
 */
 
-import . "cp-templates/common"
+import . "cp-templates/go/common"
 
 var rev []int
 var roots = []int{0, 1}

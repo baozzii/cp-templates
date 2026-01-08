@@ -1,6 +1,6 @@
 package math
 
-import . "cp-templates/common"
+import . "cp-templates/go/common"
 
 const M = 998244353
 
