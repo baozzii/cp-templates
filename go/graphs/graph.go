@@ -48,3 +48,14 @@ func (g *Graph[T]) FromWeightedEdges(edges [][]int, offset int) {
 		}
 	}
 }
+
+// Only usable after Go1.23
+// func (g *Graph[T]) Adj(u int) iter.Seq2[int, T] {
+// 	return func(yield func(int, T) bool) {
+// 		for _, e := range g.adj[u] {
+// 			if !yield(int(e.v), e.w) {
+// 				break
+// 			}
+// 		}
+// 	}
+// }
