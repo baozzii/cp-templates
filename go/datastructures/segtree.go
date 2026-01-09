@@ -1,6 +1,6 @@
 package datastructures
 
-import . "cp-templates/common"
+import . "cp-templates/go/common"
 
 type SegtreeInfo[T any] interface {
 	op(T, T) T

@@ -1,6 +1,6 @@
 package graphs
 
-import . "cp-templates/common"
+import . "cp-templates/go/common"
 
 func SccId[T Integer | Void](g *Graph[T]) []int {
 	n := int32(g.n)

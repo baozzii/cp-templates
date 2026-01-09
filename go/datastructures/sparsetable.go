@@ -4,7 +4,7 @@ package datastructures
 https://judge.yosupo.jp/submission/334191
 */
 
-import . "cp-templates/common"
+import . "cp-templates/go/common"
 
 type SparseTableInfo[T any] interface {
 	op(T, T) T

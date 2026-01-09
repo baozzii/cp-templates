@@ -1,6 +1,6 @@
 package datastructures
 
-import . "cp-templates/common"
+import . "cp-templates/go/common"
 
 type LichaoLine[K Integer, T Integer] struct{ k, b T }
 

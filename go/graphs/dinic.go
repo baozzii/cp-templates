@@ -1,6 +1,6 @@
 package graphs
 
-import . "cp-templates/common"
+import . "cp-templates/go/common"
 
 type MFGraph[Cap Integer] struct {
 	n       int32

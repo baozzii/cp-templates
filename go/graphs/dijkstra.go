@@ -2,7 +2,7 @@ package graphs
 
 import (
 	"container/heap"
-	. "cp-templates/common"
+	. "cp-templates/go/common"
 )
 
 type DijkstraPair[T Integer] struct {

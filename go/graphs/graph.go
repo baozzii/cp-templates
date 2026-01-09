@@ -1,7 +1,7 @@
 package graphs
 
 import (
-	. "cp-templates/common"
+	. "cp-templates/go/common"
 )
 
 type WeightType interface {
