@@ -293,8 +293,6 @@ func (t *AVL[T, M]) Min() T {
 	for {
 		if t.t[o].l != 0 {
 			o = t.t[o].l
-		} else if t.t[o].r != 0 {
-			o = t.t[o].r
 		} else {
 			return t.t[o].key
 		}
@@ -306,8 +304,6 @@ func (t *AVL[T, M]) Max() T {
 	for {
 		if t.t[o].r != 0 {
 			o = t.t[o].r
-		} else if t.t[o].l != 0 {
-			o = t.t[o].l
 		} else {
 			return t.t[o].key
 		}
