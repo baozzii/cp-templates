@@ -4,6 +4,8 @@ package datastructures
 https://judge.yosupo.jp/submission/334041
 */
 
+import . "cp-templates/go/common"
+
 type FenwickInfo[T any] interface {
 	add(T, T) T
 	sub(T, T) T
@@ -43,6 +45,17 @@ func (fen *Fenwick[T, M]) Pre(i int) T {
 
 func (fen *Fenwick[T, M]) Sum(l, r int) T {
 	return fen.sub(fen.Pre(r), fen.Pre(l))
+}
+
+func (fen *Fenwick[T, M]) Kth(k T, cmp func(x, y T) int) int {
+	u := 0
+	for d := Highbit(fen.n) + 1; d >= 0; d-- {
+		if u+(1<<d) <= fen.n && cmp(k, fen.t[u+(1<<d)]) >= 0 {
+			u += 1 << d
+			k = fen.sub(k, fen.t[u+(1<<d)])
+		}
+	}
+	return u
 }
 
 type FenSum struct{}
