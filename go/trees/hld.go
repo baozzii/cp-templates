@@ -176,3 +176,7 @@ func (h *HLD) MoveTo(u, v, k int) int {
 func (h *HLD) IsAnc(u, v int) bool {
 	return h.in[u] <= h.in[v] && h.out[u] >= h.out[v]
 }
+
+func (h *HLD) Dist(u, v int) int {
+	return h.t.dep[u] + h.t.dep[v] - 2*h.t.dep[h.Lca(u, v)]
+}
