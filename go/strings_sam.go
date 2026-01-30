@@ -10,7 +10,7 @@ type sam struct {
 	tr        []sam_node
 }
 
-func (s *sam) __node(len, link int32) {
+func (s *sam) __new_node(len, link int32) {
 	next := make([]int32, s.sig)
 	for i := range next {
 		next[i] = -1
@@ -23,13 +23,13 @@ func new_sam[T integer](sig T) *sam {
 	sam := sam{}
 	sam.last = 0
 	sam.sig = int32(sig)
-	sam.__node(0, -1)
+	sam.__new_node(0, -1)
 	return &sam
 }
 
 func (s *sam) extend(c int) int {
 	cur := int32(len(s.tr))
-	s.__node(s.tr[s.last].len+1, -1)
+	s.__new_node(s.tr[s.last].len+1, -1)
 	p := s.last
 	for p != -1 && s.tr[p].next[c] == -1 {
 		s.tr[p].next[c] = cur
@@ -43,7 +43,7 @@ func (s *sam) extend(c int) int {
 			s.tr[cur].link = q
 		} else {
 			clone := int32(len(s.tr))
-			s.__node(s.tr[p].len+1, s.tr[q].link)
+			s.__new_node(s.tr[p].len+1, s.tr[q].link)
 			copy(s.tr[len(s.tr)-1].next, s.tr[q].next)
 			for p != -1 && s.tr[p].next[c] == q {
 				s.tr[p].next[c] = clone
