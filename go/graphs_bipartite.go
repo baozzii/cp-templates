@@ -17,7 +17,7 @@ func bipartite[T weight_type](g *graph[T]) ([]int, bool) {
 			for _, e := range g.adj(u) {
 				v, _ := e.get()
 				if !vis[v] {
-					dfs(c, d^1)
+					dfs(v, d^1)
 				} else {
 					if col[u] == col[v] {
 						f = false
