@@ -11,10 +11,10 @@ func gcd[T integer](x, y T) T {
 	if x < 0 || y < 0 {
 		return gcd(abs(x), abs(y))
 	}
-	if y == 0 {
-		return x
+	for y != 0 {
+		x, y = y, x%y
 	}
-	return gcd(y, x%y)
+	return x
 }
 
 func lcm[T integer](x, y T) T {
@@ -22,7 +22,7 @@ func lcm[T integer](x, y T) T {
 }
 
 func pow[S, T integer](x S, n T, m S) S {
-	r := S(1)
+	r := S(1) % m
 	for ; n > 0; n, x = n>>1, x*x%m {
 		if n%2 == 1 {
 			r = r * x % m
@@ -32,9 +32,13 @@ func pow[S, T integer](x S, n T, m S) S {
 }
 
 func exgcd[T integer](a, b T) (T, T, T) {
-	if b == 0 {
-		return a, 1, 0
+	x0, y0 := T(1), T(0)
+	x1, y1 := T(0), T(1)
+	for b != 0 {
+		q := a / b
+		a, b = b, a-q*b
+		x0, x1 = x1, x0-q*x1
+		y0, y1 = y1, y0-q*y1
 	}
-	d, x2, y2 := exgcd(b, a%b)
-	return d, y2, x2 - (a/b)*y2
+	return a, x0, y0
 }
