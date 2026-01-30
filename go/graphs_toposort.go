@@ -5,7 +5,7 @@ func toposort[T weight_type](g *graph[T]) ([]int, bool) {
 	deg := make([]int32, n)
 	for i := range deg {
 		for _, e := range g.adj(i) {
-			j, _ := e.Get()
+			j, _ := e.get()
 			deg[j]++
 		}
 	}
