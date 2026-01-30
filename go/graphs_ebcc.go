@@ -7,7 +7,7 @@ func ebcc_id[T weight_type](g *graph[T]) []int {
 	i := int32(0)
 	for u := 0; u < n; u++ {
 		for _, e := range g.adj(u) {
-			v, _ := e.Get()
+			v, _ := e.get()
 			if u < v {
 				ng[v] = append(ng[v], neighbor{int32(u), i})
 				ng[u] = append(ng[u], neighbor{int32(v), i})

@@ -9,7 +9,7 @@ type edge[T weight_type] struct {
 	v int32
 }
 
-func (e edge[T]) Get() (int, T) {
+func (e edge[T]) get() (int, T) {
 	return int(e.v), e.w
 }
 

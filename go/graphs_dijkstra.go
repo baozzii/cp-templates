@@ -31,7 +31,7 @@ func dijkstra[T integer](g *graph[T], s int) []T {
 		}
 		u := cur.v
 		for _, e := range g.adj(int(u)) {
-			v, w := e.Get()
+			v, w := e.get()
 			nd := cur.d + w
 			if nd < dis[v] {
 				dis[v] = nd

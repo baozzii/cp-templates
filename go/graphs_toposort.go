@@ -1,6 +1,6 @@
 package templates
 
-func toposort[T weight_type](g *graph[T]) []int {
+func toposort[T weight_type](g *graph[T]) ([]int, bool) {
 	n := g.n()
 	deg := make([]int32, n)
 	for i := range deg {
@@ -21,12 +21,12 @@ func toposort[T weight_type](g *graph[T]) []int {
 		q = q[1:]
 		ans = append(ans, int(u))
 		for _, e := range g.adj(int(u)) {
-			v, _ := e.Get()
+			v, _ := e.get()
 			deg[v]--
 			if deg[v] == 0 {
 				q = append(q, int32(v))
 			}
 		}
 	}
-	return ans
+	return ans, len(ans) == n
 }
