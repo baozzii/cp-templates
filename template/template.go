@@ -354,6 +354,12 @@ func (v *vector[T]) slice(i, j int) vector[T] {
 	return w.copy()
 }
 
+func (v *vector[T]) scan(read func(...any)) {
+	for _, w := range *v {
+		read(w)
+	}
+}
+
 func (v *vector[T]) concat(w vector[T]) {
 	for _, c := range w {
 		v.push_back(c)
@@ -414,6 +420,14 @@ func to_uset[T comparable, E ~[]T](v E) uset[T] {
 	return cnt
 }
 
+type scannable interface {
+	scan(func(...any))
+}
+
+type writable interface {
+	format() []byte
+}
+
 type fastio struct {
 	in         io.Reader
 	out        io.Writer
@@ -455,221 +469,83 @@ func (fastio *fastio) read(ptrs ...any) {
 			}
 		}
 	}
+	read_unsigned := func() uint {
+		var x uint
+		b := fastio.__read_byte()
+		for ; '0' > b || b > '9'; b = fastio.__read_byte() {
+			if b == 0 {
+				return x
+			}
+		}
+		for ; '0' <= b && b <= '9'; b = fastio.__read_byte() {
+			x = x*10 + uint(b&15)
+		}
+		return x
+	}
+	read_signed := func() int {
+		var y uint
+		var x int
+		neg := false
+		b := fastio.__read_byte()
+		for ; '0' > b || b > '9'; b = fastio.__read_byte() {
+			if b == 0 {
+				return x
+			}
+			if b == '-' {
+				neg = true
+			}
+		}
+		for ; '0' <= b && b <= '9'; b = fastio.__read_byte() {
+			y = y*10 + uint(b&15)
+		}
+		if neg {
+			if y == math.MaxInt+1 {
+				x = math.MinInt
+			} else {
+				x = -int(y)
+			}
+		} else {
+			x = int(y)
+		}
+		return x
+	}
+	read_float := func() float64 {
+		b := fastio.__read_byte()
+		var s []byte
+		for ; b == ' ' || b == '\n' || b == '\r' || b == '\t'; b = fastio.__read_byte() {
+		}
+		for ; !(b == ' ' || b == '\n' || b == '\r' || b == '\t' || b == 0); b = fastio.__read_byte() {
+			s = append(s, b)
+		}
+		w, _ := strconv.ParseFloat(string(s), 64)
+		return w
+	}
 	for _, p := range ptrs {
 		switch v := any(p).(type) {
 		case *uint:
-			{
-				var x uint
-				b := fastio.__read_byte()
-				for ; '0' > b || b > '9'; b = fastio.__read_byte() {
-					if b == 0 {
-						return
-					}
-				}
-				for ; '0' <= b && b <= '9'; b = fastio.__read_byte() {
-					x = x*10 + uint(b&15)
-				}
-				*v = x
-			}
+			*v = read_unsigned()
 		case *uint8:
-			{
-				var x uint8
-				b := fastio.__read_byte()
-				for ; '0' > b || b > '9'; b = fastio.__read_byte() {
-					if b == 0 {
-						return
-					}
-				}
-				for ; '0' <= b && b <= '9'; b = fastio.__read_byte() {
-					x = x*10 + uint8(b&15)
-				}
-				*v = x
-			}
+			*v = uint8(read_unsigned())
 		case *uint16:
-			{
-				var x uint16
-				b := fastio.__read_byte()
-				for ; '0' > b || b > '9'; b = fastio.__read_byte() {
-					if b == 0 {
-						return
-					}
-				}
-				for ; '0' <= b && b <= '9'; b = fastio.__read_byte() {
-					x = x*10 + uint16(b&15)
-				}
-				*v = x
-			}
+			*v = uint16(read_unsigned())
 		case *uint32:
-			{
-				var x uint32
-				b := fastio.__read_byte()
-				for ; '0' > b || b > '9'; b = fastio.__read_byte() {
-					if b == 0 {
-						return
-					}
-				}
-				for ; '0' <= b && b <= '9'; b = fastio.__read_byte() {
-					x = x*10 + uint32(b&15)
-				}
-				*v = x
-			}
+			*v = uint32(read_unsigned())
 		case *uint64:
-			{
-				var x uint64
-				b := fastio.__read_byte()
-				for ; '0' > b || b > '9'; b = fastio.__read_byte() {
-					if b == 0 {
-						return
-					}
-				}
-				for ; '0' <= b && b <= '9'; b = fastio.__read_byte() {
-					x = x*10 + uint64(b&15)
-				}
-				*v = x
-			}
+			*v = uint64(read_unsigned())
 		case *int:
-			{
-				neg := false
-				b := fastio.__read_byte()
-				for ; '0' > b || b > '9'; b = fastio.__read_byte() {
-					if b == 0 {
-						return
-					}
-					if b == '-' {
-						neg = true
-					}
-				}
-				var y uint
-				var x int
-				for ; '0' <= b && b <= '9'; b = fastio.__read_byte() {
-					y = y*10 + uint(b&15)
-				}
-				if neg {
-					if y == math.MaxInt+1 {
-						x = math.MinInt
-					} else {
-						x = -int(y)
-					}
-				} else {
-					x = int(y)
-				}
-				*v = x
-			}
+			*v = read_signed()
 		case *int8:
-			{
-				neg := false
-				b := fastio.__read_byte()
-				for ; '0' > b || b > '9'; b = fastio.__read_byte() {
-					if b == 0 {
-						return
-					}
-					if b == '-' {
-						neg = true
-					}
-				}
-				var x int8
-				for ; '0' <= b && b <= '9'; b = fastio.__read_byte() {
-					x = x*10 + int8(b&15)
-				}
-				if neg {
-					x = -x
-				}
-				*v = x
-			}
+			*v = int8(read_signed())
 		case *int16:
-			{
-				neg := false
-				b := fastio.__read_byte()
-				for ; '0' > b || b > '9'; b = fastio.__read_byte() {
-					if b == 0 {
-						return
-					}
-					if b == '-' {
-						neg = true
-					}
-				}
-				var x int16
-				for ; '0' <= b && b <= '9'; b = fastio.__read_byte() {
-					x = x*10 + int16(b&15)
-				}
-				if neg {
-					x = -x
-				}
-				*v = x
-			}
+			*v = int16(read_signed())
 		case *int32:
-			{
-				neg := false
-				b := fastio.__read_byte()
-				for ; '0' > b || b > '9'; b = fastio.__read_byte() {
-					if b == 0 {
-						return
-					}
-					if b == '-' {
-						neg = true
-					}
-				}
-				var x int32
-				for ; '0' <= b && b <= '9'; b = fastio.__read_byte() {
-					x = x*10 + int32(b&15)
-				}
-				if neg {
-					x = -x
-				}
-				*v = x
-			}
+			*v = int32(read_signed())
 		case *int64:
-			{
-				neg := false
-				b := fastio.__read_byte()
-				for ; '0' > b || b > '9'; b = fastio.__read_byte() {
-					if b == 0 {
-						return
-					}
-					if b == '-' {
-						neg = true
-					}
-				}
-				var y uint
-				var x int64
-				for ; '0' <= b && b <= '9'; b = fastio.__read_byte() {
-					y = y*10 + uint(b&15)
-				}
-				if neg {
-					if y == math.MaxInt64+1 {
-						x = math.MinInt64
-					} else {
-						x = -int64(y)
-					}
-				} else {
-					x = int64(y)
-				}
-				*v = x
-			}
+			*v = int64(read_signed())
 		case *float32:
-			{
-				b := fastio.__read_byte()
-				var s []byte
-				for ; b == ' ' || b == '\n' || b == '\r' || b == '\t'; b = fastio.__read_byte() {
-				}
-				for ; !(b == ' ' || b == '\n' || b == '\r' || b == '\t' || b == 0); b = fastio.__read_byte() {
-					s = append(s, b)
-				}
-				w, _ := strconv.ParseFloat(string(s), 32)
-				*v = float32(w)
-			}
+			*v = float32(read_float())
 		case *float64:
-			{
-				b := fastio.__read_byte()
-				var s []byte
-				for ; b == ' ' || b == '\n' || b == '\r' || b == '\t'; b = fastio.__read_byte() {
-				}
-				for ; !(b == ' ' || b == '\n' || b == '\r' || b == '\t' || b == 0); b = fastio.__read_byte() {
-					s = append(s, b)
-				}
-				w, _ := strconv.ParseFloat(string(s), 64)
-				*v = w
-			}
+			*v = read_float()
 		case *string:
 			{
 				b := fastio.__read_byte()
@@ -682,16 +558,20 @@ func (fastio *fastio) read(ptrs ...any) {
 				*v = string(s)
 			}
 		default:
-			rv := reflect.ValueOf(p)
-			if rv.Kind() == reflect.Ptr && (rv.Elem().Kind() == reflect.Slice || rv.Elem().Kind() == reflect.Array) {
-				rd(rv.Elem())
+			if v, ok := p.(scannable); ok {
+				v.scan(fastio.read)
+			} else {
+				rv := reflect.ValueOf(p)
+				if rv.Kind() == reflect.Ptr && (rv.Elem().Kind() == reflect.Slice || rv.Elem().Kind() == reflect.Array) {
+					rd(rv.Elem())
+				}
 			}
 		}
 	}
 }
 
 func (fastio *fastio) write(a ...any) {
-	uitos := func(v uint64) []byte {
+	unsigned_to_string := func(v uint64) []byte {
 		var s []byte
 		if v == 0 {
 			return []byte{'0'}
@@ -705,7 +585,7 @@ func (fastio *fastio) write(a ...any) {
 		}
 		return s
 	}
-	itos := func(v int64) []byte {
+	signed_to_string := func(v int64) []byte {
 		if v == 0 {
 			return []byte{'0'}
 		}
@@ -736,26 +616,26 @@ func (fastio *fastio) write(a ...any) {
 		}
 		switch v := p.(type) {
 		case uint:
-			fastio.wbuf = append(fastio.wbuf, uitos(uint64(v))...)
+			fastio.wbuf = append(fastio.wbuf, unsigned_to_string(uint64(v))...)
 		case uint8:
-			fastio.wbuf = append(fastio.wbuf, uitos(uint64(v))...)
+			fastio.wbuf = append(fastio.wbuf, unsigned_to_string(uint64(v))...)
 		case uint16:
-			fastio.wbuf = append(fastio.wbuf, uitos(uint64(v))...)
+			fastio.wbuf = append(fastio.wbuf, unsigned_to_string(uint64(v))...)
 		case uint32:
-			fastio.wbuf = append(fastio.wbuf, uitos(uint64(v))...)
+			fastio.wbuf = append(fastio.wbuf, unsigned_to_string(uint64(v))...)
 		case uint64:
-			fastio.wbuf = append(fastio.wbuf, uitos(v)...)
+			fastio.wbuf = append(fastio.wbuf, unsigned_to_string(v)...)
 
 		case int:
-			fastio.wbuf = append(fastio.wbuf, itos(int64(v))...)
+			fastio.wbuf = append(fastio.wbuf, signed_to_string(int64(v))...)
 		case int8:
-			fastio.wbuf = append(fastio.wbuf, itos(int64(v))...)
+			fastio.wbuf = append(fastio.wbuf, signed_to_string(int64(v))...)
 		case int16:
-			fastio.wbuf = append(fastio.wbuf, itos(int64(v))...)
+			fastio.wbuf = append(fastio.wbuf, signed_to_string(int64(v))...)
 		case int32:
-			fastio.wbuf = append(fastio.wbuf, itos(int64(v))...)
+			fastio.wbuf = append(fastio.wbuf, signed_to_string(int64(v))...)
 		case int64:
-			fastio.wbuf = append(fastio.wbuf, itos(v)...)
+			fastio.wbuf = append(fastio.wbuf, signed_to_string(v)...)
 
 		case float32:
 			fastio.wbuf = append(fastio.wbuf, []byte(strconv.FormatFloat(float64(v), 'f', fastio.fpc, 64))...)
@@ -764,22 +644,26 @@ func (fastio *fastio) write(a ...any) {
 		case string:
 			fastio.wbuf = append(fastio.wbuf, v...)
 		default:
-			rv := reflect.ValueOf(p)
-			if rv.Kind() == reflect.Slice || rv.Kind() == reflect.Array {
-				if rv.Type().Elem().Kind() == reflect.Slice {
-					for j := 0; j < rv.Len(); j++ {
-						if j+1 == rv.Len() {
+			if v, ok := p.(writable); ok {
+				fastio.wbuf = append(fastio.wbuf, v.format()...)
+			} else {
+				rv := reflect.ValueOf(p)
+				if rv.Kind() == reflect.Slice || rv.Kind() == reflect.Array {
+					if rv.Type().Elem().Kind() == reflect.Slice {
+						for j := 0; j < rv.Len(); j++ {
+							if j+1 == rv.Len() {
+								fastio.write(rv.Index(j).Interface())
+							} else {
+								fastio.writeln(rv.Index(j).Interface())
+							}
+						}
+					} else {
+						for j := 0; j < rv.Len(); j++ {
+							if j != 0 {
+								fastio.wbuf = append(fastio.wbuf, ' ')
+							}
 							fastio.write(rv.Index(j).Interface())
-						} else {
-							fastio.writeln(rv.Index(j).Interface())
 						}
-					}
-				} else {
-					for j := 0; j < rv.Len(); j++ {
-						if j != 0 {
-							fastio.wbuf = append(fastio.wbuf, ' ')
-						}
-						fastio.write(rv.Index(j).Interface())
 					}
 				}
 			}
@@ -801,19 +685,12 @@ func (fastio *fastio) flush() {
 	fastio.wbuf = fastio.wbuf[:0]
 }
 
-func (fastio *fastio) close() {
-	fastio.flush()
-}
-
-var stdio = new_std_fastio()
-
 var (
-	read          = stdio.read
-	write         = stdio.write
-	writeln       = stdio.writeln
-	flush         = stdio.flush
-	close         = stdio.flush
-	set_precision = stdio.set_precision
+	stdio   = new_std_fastio()
+	read    = stdio.read
+	write   = stdio.write
+	writeln = stdio.writeln
+	flush   = stdio.flush
 )
 
 func solve() {
@@ -825,5 +702,5 @@ func main() {
 	for read(&t); t > 0; t-- {
 		solve()
 	}
-	close()
+	flush()
 }

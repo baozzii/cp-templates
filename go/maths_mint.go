@@ -68,3 +68,25 @@ func (x mint) pow(y int) mint {
 	}
 	return r
 }
+
+func (x *mint) scan(read func(...any)) {
+	var y int
+	read(&y)
+	*x = norm(y)
+}
+
+func (x mint) format() []byte {
+	if x == 0 {
+		return []byte{'0'}
+	} else {
+		var b []byte
+		for x > 0 {
+			b = append(b, '0'+byte(x%10))
+			x /= 10
+		}
+		for i := range len(b) / 2 {
+			b[i], b[len(b)-i-1] = b[len(b)-i-1], b[i]
+		}
+		return b
+	}
+}

@@ -72,6 +72,12 @@ func (v *vector[T]) slice(i, j int) vector[T] {
 	return w.copy()
 }
 
+func (v *vector[T]) scan(read func(...any)) {
+	for _, w := range *v {
+		read(w)
+	}
+}
+
 func (v *vector[T]) concat(w vector[T]) {
 	for _, c := range w {
 		v.push_back(c)
