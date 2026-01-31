@@ -73,8 +73,8 @@ func (v *vector[T]) slice(i, j int) vector[T] {
 }
 
 func (v *vector[T]) scan(read func(...any)) {
-	for _, w := range *v {
-		read(w)
+	for i := range *v {
+		read(&(*v)[i])
 	}
 }
 
