@@ -16,7 +16,414 @@ import (
 	"unsafe"
 )
 
-type LeetcodeIO struct {
+func ctz[T integer](x T) int {
+	return bits.TrailingZeros(uint(x))
+}
+
+func clz[T integer](x T) int {
+	return bits.LeadingZeros(uint(x))
+}
+
+func popcount[T integer](x T) int {
+	return bits.OnesCount(uint(x))
+}
+
+func lowbit[T integer](x T) T {
+	y := uint(x)
+	return T(y & -y)
+}
+
+func highbit[T integer](x T) T {
+	if x == 0 {
+		return x
+	}
+	return T(1) << (63 - clz(uint(x)))
+}
+
+type void struct{}
+
+type numeric_limits[T integer] struct{}
+
+func limit[T integer]() numeric_limits[T] {
+	return struct{}{}
+}
+
+func (numeric_limits[T]) max() T {
+	var z T
+	if (^z) < 0 {
+		b := uint(unsafe.Sizeof(z) * 8)
+		u := uint(1)<<(b-1) - 1
+		return T(u)
+	} else {
+		return ^z
+	}
+}
+
+func (numeric_limits[T]) min() T {
+	var z T
+	if (^z) < 0 {
+		b := uint(unsafe.Sizeof(z) * 8)
+		u := uint(1) << (b - 1)
+		return T(-int(u))
+	}
+	return 0
+}
+
+func to_string[T any](e T) string {
+	return fmt.Sprintf("%v", e)
+}
+
+func to_int[T integer](s string) T {
+	x, _ := strconv.Atoi(s)
+	return T(x)
+}
+
+func ckmax[T cmp.Ordered](x *T, y T) {
+	*x = max(*x, y)
+}
+
+func ckmin[T cmp.Ordered](x *T, y T) {
+	*x = min(*x, y)
+}
+
+func sum[T complex, E ~[]T](v E) T {
+	var s T
+	for _, w := range v {
+		s += w
+	}
+	return s
+}
+
+func presum[T complex, E ~[]T](v E) E {
+	p := make(E, len(v)+1)
+	for i, w := range v {
+		p[i+1] = p[i] + w
+	}
+	return p
+}
+
+func count[T comparable, E ~[]T](v E, e T) int {
+	cnt := 0
+	for _, w := range v {
+		if w == e {
+			cnt++
+		}
+	}
+	return cnt
+}
+
+func cond[T any](cond bool, x, y T) T {
+	if cond {
+		return x
+	}
+	return y
+}
+
+func abs[T real](x T) T {
+	if x < T(0) {
+		return -x
+	}
+	return x
+}
+
+func gcd[T integer](x, y T) T {
+	if x < 0 || y < 0 {
+		return gcd(abs(x), abs(y))
+	}
+	for y != 0 {
+		x, y = y, x%y
+	}
+	return x
+}
+
+func lcm[T integer](x, y T) T {
+	return x / gcd(x, y) * y
+}
+
+func pow[S, T integer](x S, n T, m S) S {
+	r := S(1) % m
+	for ; n > 0; n, x = n>>1, x*x%m {
+		if n%2 == 1 {
+			r = r * x % m
+		}
+	}
+	return r
+}
+
+func exgcd[T integer](a, b T) (T, T, T) {
+	x0, y0 := T(1), T(0)
+	x1, y1 := T(0), T(1)
+	for b != 0 {
+		q := a / b
+		a, b = b, a-q*b
+		x0, x1 = x1, x0-q*x1
+		y0, y1 = y1, y0-q*y1
+	}
+	return a, x0, y0
+}
+
+type integer interface {
+	~int | ~int8 | ~int16 | ~int32 | ~int64 |
+		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64
+}
+
+type real interface {
+	integer |
+		~float32 | ~float64
+}
+
+type complex interface {
+	real |
+		~complex64 | ~complex128
+}
+
+type umap[T comparable, K any] map[T]K
+
+func (s *umap[T, K]) erase(x T) {
+	delete(*s, x)
+}
+
+func (s *umap[T, K]) contains(x T) bool {
+	_, ok := (*s)[x]
+	return ok
+}
+
+func (s *umap[T, K]) size() int {
+	return len(*s)
+}
+
+func (s *umap[T, K]) empty() bool {
+	return s.size() == 0
+}
+
+func (s *umap[T, K]) clear() {
+	clear(*s)
+}
+
+func (s *umap[T, K]) keys() vector[T] {
+	b := make(vector[T], 0, s.size())
+	for v := range *s {
+		b.push_back(v)
+	}
+	return b
+}
+
+func (s *umap[T, K]) values() vector[K] {
+	b := make(vector[K], 0, s.size())
+	for _, v := range *s {
+		b.push_back(v)
+	}
+	return b
+}
+
+type uset[T comparable] map[T]struct{}
+
+func (s *uset[T]) insert(x T) {
+	(*s)[x] = struct{}{}
+}
+
+func (s *uset[T]) erase(x T) {
+	delete(*s, x)
+}
+
+func (s *uset[T]) contains(x T) bool {
+	_, ok := (*s)[x]
+	return ok
+}
+
+func (s *uset[T]) size() int {
+	return len(*s)
+}
+
+func (s *uset[T]) empty() bool {
+	return s.size() == 0
+}
+
+func (s *uset[T]) clear() {
+	clear(*s)
+}
+
+func (s *uset[T]) keys() vector[T] {
+	b := make(vector[T], 0, s.size())
+	for v := range *s {
+		b.push_back(v)
+	}
+	return b
+}
+
+func (s *uset[T]) copy() uset[T] {
+	t := make(uset[T])
+	t.union(*s)
+	return t
+}
+
+func (s *uset[T]) union(t uset[T]) {
+	for v := range t {
+		s.insert(v)
+	}
+}
+
+func (s *uset[T]) intersect(t uset[T]) {
+	ns := make(uset[T])
+	for v := range t {
+		if s.contains(v) {
+			ns.insert(v)
+		}
+	}
+	*s = ns
+}
+
+func union[T comparable](s, t uset[T]) uset[T] {
+	ns := s.copy()
+	ns.union(t)
+	return ns
+}
+
+func intersect[T comparable](s, t uset[T]) uset[T] {
+	ns := make(uset[T])
+	for v := range s {
+		if t.contains(v) {
+			ns.insert(v)
+		}
+	}
+	return ns
+}
+
+type vector[T any] []T
+
+func (v *vector[T]) size() int {
+	return len(*v)
+}
+
+func (v *vector[T]) empty() bool {
+	return len(*v) == 0
+}
+
+func (v *vector[T]) clear() {
+	*v = (*v)[:0]
+}
+
+func (v *vector[T]) push_back(x T) {
+	*v = append(*v, x)
+}
+
+func (v *vector[T]) pop_back() {
+	*v = (*v)[:len(*v)-1]
+}
+
+func (v *vector[T]) resize(x int) {
+	if v.size() > x {
+		*v = (*v)[:x]
+	} else {
+		*v = append(*v, make([]T, x-v.size())...)
+	}
+}
+
+func (v *vector[T]) back() *T {
+	return &((*v)[v.size()-1])
+}
+
+func (v *vector[T]) front() *T {
+	return &((*v)[0])
+}
+
+func (v *vector[T]) erase(x, y int) {
+	*v = slices.Delete(*v, x, y)
+}
+
+func (v *vector[T]) insert(x int, w ...T) {
+	*v = slices.Insert(*v, x, w...)
+}
+
+func (v *vector[T]) reverse() {
+	n := v.size()
+	for i := 0; i < n/2; i++ {
+		(*v)[i], (*v)[n-i-1] = (*v)[n-i-1], (*v)[i]
+	}
+}
+
+func (v *vector[T]) fill(w T) {
+	for i := range *v {
+		(*v)[i] = w
+	}
+}
+
+func (v *vector[T]) copy() vector[T] {
+	return slices.Clone(*v)
+}
+
+func (v *vector[T]) slice(i, j int) vector[T] {
+	w := (*v)[i:j]
+	return w.copy()
+}
+
+func (v *vector[T]) scan(read func(...any)) {
+	for _, w := range *v {
+		read(w)
+	}
+}
+
+func (v *vector[T]) concat(w vector[T]) {
+	for _, c := range w {
+		v.push_back(c)
+	}
+}
+
+func concat[T any](a, b vector[T]) vector[T] {
+	na := a.copy()
+	na.concat(b)
+	return na
+}
+
+func vec1[T any, S integer](n ...S) vector[T] {
+	if len(n) == 0 {
+		return make(vector[T], 0)
+	} else {
+		return make(vector[T], n[0])
+	}
+}
+
+func vec2[T any, S integer](n ...S) vector[vector[T]] {
+	if len(n) == 0 {
+		return make(vector[vector[T]], 0)
+	} else {
+		res := make(vector[vector[T]], n[0])
+		for i := range res {
+			res[i] = vec1[T](n[1:]...)
+		}
+		return res
+	}
+}
+
+func vec3[T any, S integer](n ...S) vector[vector[vector[T]]] {
+	if len(n) == 0 {
+		return make(vector[vector[vector[T]]], 0)
+	} else {
+		res := make(vector[vector[vector[T]]], n[0])
+		for i := range res {
+			res[i] = vec2[T](n[1:]...)
+		}
+		return res
+	}
+}
+
+func to_umap[T comparable, E ~[]T](v E) umap[T, int] {
+	cnt := make(umap[T, int])
+	for _, w := range v {
+		cnt[w]++
+	}
+	return cnt
+}
+
+func to_uset[T comparable, E ~[]T](v E) uset[T] {
+	cnt := make(uset[T])
+	for _, w := range v {
+		cnt.insert(w)
+	}
+	return cnt
+}
+
+type leetcodeio struct {
 	paramtypes []reflect.Type
 	paramcount int
 	fntype     reflect.Type
@@ -25,7 +432,7 @@ type LeetcodeIO struct {
 	out        *bufio.Writer
 }
 
-func RegisterFunc(f any) *LeetcodeIO {
+func register(f any) *leetcodeio {
 	fn := reflect.ValueOf(f)
 	fntype := reflect.TypeOf(f)
 	if fntype == nil || fntype.Kind() != reflect.Func {
@@ -36,10 +443,10 @@ func RegisterFunc(f any) *LeetcodeIO {
 	for i := 0; i < pcount; i++ {
 		paramtypes[i] = fntype.In(i)
 	}
-	return &LeetcodeIO{paramtypes, pcount, fntype, fn, bufio.NewReader(os.Stdin), bufio.NewWriter(os.Stdout)}
+	return &leetcodeio{paramtypes, pcount, fntype, fn, bufio.NewReader(os.Stdin), bufio.NewWriter(os.Stdout)}
 }
 
-func (io *LeetcodeIO) parse(s string, r reflect.Type) reflect.Value {
+func (io *leetcodeio) __parse(s string, r reflect.Type) reflect.Value {
 	if r.Kind() == reflect.String {
 		var v string
 		if err := json.Unmarshal([]byte(s), &v); err != nil {
@@ -88,12 +495,12 @@ func (io *LeetcodeIO) parse(s string, r reflect.Type) reflect.Value {
 	return ptr.Elem()
 }
 
-func (io *LeetcodeIO) format(r reflect.Value) string {
+func (io *leetcodeio) __format(r reflect.Value) string {
 	b, _ := json.Marshal(r.Interface())
 	return string(b)
 }
 
-func (io *LeetcodeIO) Run() {
+func (io *leetcodeio) run() {
 	defer io.out.Flush()
 	for {
 		args := make([]reflect.Value, io.paramcount)
@@ -102,405 +509,21 @@ func (io *LeetcodeIO) Run() {
 			if err != nil && len(s) == 0 {
 				return
 			}
-			args[i] = io.parse(strings.TrimSpace(s), io.paramtypes[i])
+			args[i] = io.__parse(strings.TrimSpace(s), io.paramtypes[i])
 		}
-		res := io.execute(args)
-		fmt.Fprintln(io.out, io.format(res[0]))
+		res := io.__execute(args)
+		fmt.Fprintln(io.out, io.__format(res[0]))
 	}
 }
 
-func (io *LeetcodeIO) execute(args []reflect.Value) []reflect.Value {
+func (io *leetcodeio) __execute(args []reflect.Value) []reflect.Value {
 	return io.fn.Call(args)
 }
 
-type Integer interface {
-	~int | ~int8 | ~int16 | ~int32 | ~int64 |
-		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64
-}
+func solve() {
 
-type RealNumber interface {
-	Integer |
-		~float32 | ~float64
-}
-
-type ComplexNumber interface {
-	RealNumber |
-		~complex64 | ~complex128
-}
-
-type Void struct{}
-
-type NumericLimit[T Integer] struct{}
-
-func Limit[T Integer]() NumericLimit[T] {
-	return struct{}{}
-}
-
-func (NumericLimit[T]) Max() T {
-	var z T
-	if (^z) < 0 {
-		b := uint(unsafe.Sizeof(z) * 8)
-		u := uint(1)<<(b-1) - 1
-		return T(u)
-	} else {
-		return ^z
-	}
-}
-
-func (NumericLimit[T]) Min() T {
-	var z T
-	if (^z) < 0 {
-		b := uint(unsafe.Sizeof(z) * 8)
-		u := uint(1) << (b - 1)
-		return T(-int(u))
-	}
-	return 0
-}
-
-func ToString[T any](e T) string {
-	return fmt.Sprintf("%v", e)
-}
-
-func ToInt(s string) int {
-	x, _ := strconv.Atoi(s)
-	return x
-}
-
-func Chmax[T cmp.Ordered](x *T, y T) {
-	*x = max(*x, y)
-}
-
-func Chmin[T cmp.Ordered](x *T, y T) {
-	*x = min(*x, y)
-}
-
-func Sum[T ComplexNumber, E ~[]T](v E) T {
-	var s T
-	for _, w := range v {
-		s += w
-	}
-	return s
-}
-
-func PreSum[T ComplexNumber, E ~[]T](v E) E {
-	p := make(E, len(v)+1)
-	for i, w := range v {
-		p[i+1] = p[i] + w
-	}
-	return p
-}
-
-func Count[T comparable, E ~[]T](v E, e T) int {
-	cnt := 0
-	for _, w := range v {
-		if w == e {
-			cnt++
-		}
-	}
-	return cnt
-}
-
-func Iota[T Integer, E ~[]T](v E, e T) {
-	for i := range v {
-		v[i] = e + T(i)
-	}
-}
-
-func Cond[T any](cond bool, x, y T) T {
-	if cond {
-		return x
-	}
-	return y
-}
-
-func Ctz[T Integer](x T) int {
-	return bits.TrailingZeros(uint(x))
-}
-
-func Clz[T Integer](x T) int {
-	return bits.LeadingZeros(uint(x))
-}
-
-func Popcount[T Integer](x T) int {
-	return bits.OnesCount(uint(x))
-}
-
-func Lowbit[T Integer](x T) T {
-	y := uint(x)
-	return T(y & -y)
-}
-
-func Highbit[T Integer](x T) T {
-	if x == 0 {
-		return x
-	}
-	return T(1) << (63 - Clz(uint(x)))
-}
-
-func Abs[T RealNumber](x T) T {
-	if x < T(0) {
-		return -x
-	}
-	return x
-}
-
-func Gcd[T Integer](x, y T) T {
-	if x < 0 || y < 0 {
-		return Gcd(Abs(x), Abs(y))
-	}
-	if y == 0 {
-		return x
-	}
-	return Gcd(y, x%y)
-}
-
-func Lcm[T Integer](x, y T) T {
-	return x / Gcd(x, y) * y
-}
-
-func Pow[S, T Integer](x S, n T, m S) S {
-	r := S(1)
-	for ; n > 0; n, x = n>>1, x*x%m {
-		if n%2 == 1 {
-			r = r * x % m
-		}
-	}
-	return r
-}
-
-func Exgcd[T Integer](a, b T) (T, T, T) {
-	if b == 0 {
-		return a, 1, 0
-	}
-	d, x2, y2 := Exgcd(b, a%b)
-	return d, y2, x2 - (a/b)*y2
-}
-
-type Vec[T any] []T
-
-func (v *Vec[T]) Size() int {
-	return len(*v)
-}
-
-func (v *Vec[T]) Empty() bool {
-	return len(*v) == 0
-}
-
-func (v *Vec[T]) Clear() {
-	*v = (*v)[:0]
-}
-
-func (v *Vec[T]) PushBack(x T) {
-	*v = append(*v, x)
-}
-
-func (v *Vec[T]) PopBack() {
-	*v = (*v)[:len(*v)-1]
-}
-
-func (v *Vec[T]) Resize(x int) {
-	if v.Size() > x {
-		*v = (*v)[:x]
-	} else {
-		*v = append(*v, make([]T, x-v.Size())...)
-	}
-}
-
-func (v *Vec[T]) Back() *T {
-	return &((*v)[v.Size()-1])
-}
-
-func (v *Vec[T]) Front() *T {
-	return &((*v)[0])
-}
-
-func (v *Vec[T]) Erase(x, y int) {
-	*v = slices.Delete(*v, x, y)
-}
-
-func (v *Vec[T]) Insert(x int, w ...T) {
-	*v = slices.Insert(*v, x, w...)
-}
-
-func (v *Vec[T]) Reverse() {
-	n := v.Size()
-	for i := 0; i < n/2; i++ {
-		(*v)[i], (*v)[n-i-1] = (*v)[n-i-1], (*v)[i]
-	}
-}
-
-func (v *Vec[T]) Fill(w T) {
-	for i := range *v {
-		(*v)[i] = w
-	}
-}
-
-func ToVec1[T any, E ~[]T](v E) Vec[T] {
-	return Vec[T](v)
-}
-
-func ToSlice1[T any](v Vec[T]) []T {
-	return []T(v)
-}
-
-func ToVec2[T any, E ~[][]T](v E) Vec[Vec[T]] {
-	res := make(Vec[Vec[T]], len(v))
-	for i := range v {
-		res[i] = ToVec1(v[i])
-	}
-	return res
-}
-
-func ToSlice2[T any](v Vec[Vec[T]]) [][]T {
-	res := make([][]T, len(v))
-	for i := range v {
-		res[i] = ToSlice1(v[i])
-	}
-	return res
-}
-
-func ToVec3[T any, E ~[][][]T](v E) Vec[Vec[Vec[T]]] {
-	res := make(Vec[Vec[Vec[T]]], len(v))
-	for i := range v {
-		res[i] = ToVec2(v[i])
-	}
-	return res
-}
-
-func ToSlice3[T any](v Vec[Vec[Vec[T]]]) [][][]T {
-	res := make([][][]T, len(v))
-	for i := range v {
-		res[i] = ToSlice2(v[i])
-	}
-	return res
-}
-
-func Vec1[T any](n ...int) Vec[T] {
-	if len(n) == 0 {
-		return make(Vec[T], 0)
-	}
-	return make(Vec[T], n[0])
-}
-
-func Vec2[T any](n ...int) Vec[Vec[T]] {
-	if len(n) == 0 {
-		return make(Vec[Vec[T]], 0)
-	}
-	v := make(Vec[Vec[T]], n[0])
-	for i := range v {
-		v[i] = Vec1[T](n[1:]...)
-	}
-	return v
-}
-
-func Vec3[T any](n ...int) Vec[Vec[Vec[T]]] {
-	if len(n) == 0 {
-		return make(Vec[Vec[Vec[T]]], 0)
-	}
-	v := make(Vec[Vec[Vec[T]]], n[0])
-	for i := range v {
-		v[i] = Vec2[T](n[1:]...)
-	}
-	return v
-}
-
-func (v *Vec[T]) Copy() Vec[T] {
-	return slices.Clone(*v)
-}
-
-func (v *Vec[T]) Slice(i, j int) Vec[T] {
-	w := (*v)[i:j]
-	return w.Copy()
-}
-
-type Uset[T comparable] map[T]struct{}
-
-func (s *Uset[T]) Insert(x T) {
-	(*s)[x] = struct{}{}
-}
-
-func (s *Uset[T]) Erase(x T) {
-	delete(*s, x)
-}
-
-func (s *Uset[T]) Contains(x T) bool {
-	_, ok := (*s)[x]
-	return ok
-}
-
-func (s *Uset[T]) Size() int {
-	return len(*s)
-}
-
-func (s *Uset[T]) Empty() bool {
-	return s.Size() == 0
-}
-
-func (s *Uset[T]) Clear() {
-	clear(*s)
-}
-
-func (s *Uset[T]) Keys() Vec[T] {
-	b := make(Vec[T], 0, s.Size())
-	for v := range *s {
-		b.PushBack(v)
-	}
-	return b
-}
-
-func (s *Uset[T]) FromVec(v Vec[T]) {
-	for _, w := range v {
-		s.Insert(w)
-	}
-}
-
-type Umap[T comparable, K any] map[T]K
-
-func (s *Umap[T, K]) Erase(x T) {
-	delete(*s, x)
-}
-
-func (s *Umap[T, K]) Contains(x T) bool {
-	_, ok := (*s)[x]
-	return ok
-}
-
-func (s *Umap[T, K]) Size() int {
-	return len(*s)
-}
-
-func (s *Umap[T, K]) Empty() bool {
-	return s.Size() == 0
-}
-
-func (s *Umap[T, K]) Clear() {
-	clear(*s)
-}
-
-func (s *Umap[T, K]) Keys() Vec[T] {
-	b := make(Vec[T], 0, s.Size())
-	for v := range *s {
-		b.PushBack(v)
-	}
-	return b
-}
-
-func (s *Umap[T, K]) Values() Vec[K] {
-	b := make(Vec[K], 0, s.Size())
-	for _, v := range *s {
-		b.PushBack(v)
-	}
-	return b
-}
-
-func Counter[T comparable, E ~[]T](v E) Umap[T, int] {
-	cnt := make(Umap[T, int])
-	for _, w := range v {
-		cnt[w]++
-	}
-	return cnt
 }
 
 func main() {
-	RegisterFunc(nil).Run()
+	register(nil).run()
 }
