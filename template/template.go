@@ -118,6 +118,11 @@ func cond[T any](cond bool, x, y T) T {
 	return y
 }
 
+func lower_bound[T cmp.Ordered, E ~[]T](a E, v T) int {
+	l, _ := slices.BinarySearch(a, v)
+	return l
+}
+
 func abs[T real](x T) T {
 	if x < T(0) {
 		return -x

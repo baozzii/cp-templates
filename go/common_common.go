@@ -3,6 +3,7 @@ package templates
 import (
 	"cmp"
 	"fmt"
+	"slices"
 	"strconv"
 	"unsafe"
 )
@@ -84,4 +85,9 @@ func cond[T any](cond bool, x, y T) T {
 		return x
 	}
 	return y
+}
+
+func lower_bound[T cmp.Ordered, E ~[]T](a E, v T) int {
+	l, _ := slices.BinarySearch(a, v)
+	return l
 }
