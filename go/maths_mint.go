@@ -12,6 +12,9 @@ const (
 type mint int
 
 func norm[T integer](x T) mint {
+	if x >= 0 && int(x) < M {
+		return mint(x)
+	}
 	y := int(x)
 	y %= M
 	if y < 0 {
@@ -48,6 +51,9 @@ func (x mint) mul(y mint) mint {
 }
 
 func (x mint) inv() mint {
+	if x == 2 {
+		return (M + 1) / 2
+	}
 	_, v, _ := exgcd(x, M)
 	if v < 0 {
 		v += M
