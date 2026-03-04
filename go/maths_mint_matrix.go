@@ -39,28 +39,31 @@ func (a mint_matrix) matrix_mul(b mint_matrix) mint_matrix {
 }
 
 func (a mint_matrix) add(b mint_matrix) mint_matrix {
+	c := new_zero_mint_matrix(a.row(), a.col())
 	for i := range a.row() {
 		for j := range a.col() {
-			a[i][j] = a[i][j].add(b[i][j])
+			c[i][j] = a[i][j].add(b[i][j])
 		}
 	}
-	return a
+	return c
 }
 
 func (a mint_matrix) sub(b mint_matrix) mint_matrix {
+	c := new_zero_mint_matrix(a.row(), a.col())
 	for i := range a.row() {
 		for j := range a.col() {
-			a[i][j] = a[i][j].sub(b[i][j])
+			c[i][j] = a[i][j].sub(b[i][j])
 		}
 	}
-	return a
+	return c
 }
 
 func (a mint_matrix) scalar_mul(x mint) mint_matrix {
+	c := new_zero_mint_matrix(a.row(), a.col())
 	for i := range a.row() {
 		for j := range a.col() {
-			a[i][j] = a[i][j].mul(x)
+			c[i][j] = a[i][j].mul(x)
 		}
 	}
-	return a
+	return c
 }

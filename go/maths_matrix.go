@@ -39,27 +39,30 @@ func (a matrix[T]) matrix_mul(b matrix[T]) matrix[T] {
 }
 
 func (a matrix[T]) add(b matrix[T]) matrix[T] {
+	c := new_zero_matrix[T](a.row(), a.col())
 	for i := range a.row() {
 		for j := range a.col() {
-			a[i][j] += b[i][j]
+			c[i][j] = a[i][j] + b[i][j]
 		}
 	}
 	return a
 }
 
 func (a matrix[T]) sub(b matrix[T]) matrix[T] {
+	c := new_zero_matrix[T](a.row(), a.col())
 	for i := range a.row() {
 		for j := range a.col() {
-			a[i][j] -= b[i][j]
+			c[i][j] = a[i][j] - b[i][j]
 		}
 	}
 	return a
 }
 
 func (a matrix[T]) scalar_mul(x T) matrix[T] {
+	c := new_zero_matrix[T](a.row(), a.col())
 	for i := range a.row() {
 		for j := range a.col() {
-			a[i][j] *= x
+			c[i][j] = a[i][j] * x
 		}
 	}
 	return a
