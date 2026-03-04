@@ -81,7 +81,7 @@ func new_lazysegtree_with[T, K any, M lazysegtree_info[T, K], E ~[]T](a E, m M) 
 	}
 }
 
-func new_lazy_segtree[T, K any, M lazysegtree_info[T, K]](n int, m M) *lazysegtree[T, K, M] {
+func new_lazysegtree[T, K any, M lazysegtree_info[T, K]](n int, m M) *lazysegtree[T, K, M] {
 	a := make([]T, n)
 	e := m.e
 	for i := range a {
